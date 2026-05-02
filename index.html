@@ -814,10 +814,10 @@ function go(){
       var missingHtml='';EN.forEach(function(k){if(el[k]===0)missingHtml+=' <b style="color:var(--zhusha)">缺'+k+'</b>';});
       document.getElementById('dmi').innerHTML=GY[dp.gi]+dEl+' · 日主偏'+str+' · '+virtueMap[dEl]+'德之命<br>'+tagHtml+'<br><span style="font-size:.78rem">五行：木'+el['木']+' 火'+el['火']+' 土'+el['土']+' 金'+el['金']+' 水'+el['水']+missingHtml+'</span>';
       document.getElementById('ptx').innerHTML=pers.text.split('\n').filter(function(p){return p.trim()}).map(function(p){return'<div class="ln-item">'+p+'</div>';}).join('');
-      var ssDescs={比肩:'同我助力',劫财:'争财竞争',食神:'才华福气',伤官:'创意叛逆',偏财:'意外之财',正财:'稳定收入',七杀:'权威压力',正官:'贵人名声',偏印:'偏才技艺',正印:'学识庇护'};
+      var ssDescs={比肩:'独立自主，同辈助力，但过旺则争强好胜',劫财:'竞争心重，财来财去，社交场合的存在感',食神:'才华福气，感受力强，懂得享受生活',伤官:'创意叛逆，不走寻常路，表达能力出众',偏财:'意外之财，人缘通达，对金钱嗅觉灵敏',正财:'稳定收入，务实理财，感情上专一可靠',七杀:'权威压力，敢闯敢拼，魄力十足但需防冲动',正官:'贵人名声，规则意识强，在体制内容易出头',偏印:'偏才技艺，直觉敏锐，擅长技术或冷门领域',正印:'学识庇护，学习能力强，有慈悲心'};
       document.getElementById('ssg').innerHTML=Object.entries(ssCount).map(function(x){return'<div class="ss-item"><div class="ss-name">'+x[0]+'</div><div class="ss-count">'+x[1]+'</div><div class="ss-desc">'+ssDescs[x[0]]+'</div></div>';}).join('');
       document.getElementById('gjn').textContent=geju;
-      var gjDescs={正官格:'官星当令，宜公职仕途',七杀格:'杀星得力，宜武职创业',正印格:'印星高照，宜学术文教',偏印格:'偏印独秀，宜技术研究',正财格:'财星当令，宜商贾理财',偏财格:'偏财旺盛，宜投资副业',食神格:'食神吐秀，宜艺术餐饮',伤官格:'伤官泄秀，宜自由创作',建禄格:'建禄当令，宜独立自主',羊刃格:'羊刃逢冲，宜武职竞技'};
+      var gjDescs={正官格:'正官当令——你骨子里是走正道的人，规则意识强，在大机构或体制内往往比在江湖上走得更稳。适合公职、管理、律师等需要信誉积累的领域。',七杀格:'七杀当令——你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技类领域是你的天然战场。',正印格:'正印高照——你学习能力强，吸收知识快，而且学进去的东西能真正转化为能力。适合走学术路线，或者成为某个领域的深度专家。',偏印格:'偏印独秀——你的才华不在主流赛道，深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财当令——稳健积累是你的主旋律。你不是那种靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业等。',偏财格:'偏财旺盛——你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'食神吐秀——你自带让人想靠近的气场，有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官泄秀——你有说出来就让人惊讶的天赋。但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄当令——你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃逢冲——你身上有不服输的血性，这是力量源，也需要方向约束。没有约束的力量比软弱更危险，适合军警、竞技、法律等强对抗领域。'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
       document.getElementById('ysg').innerHTML='<div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+ys.xi.join(' · ')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+ys.ji.join(' · ')+'</div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
@@ -826,7 +826,7 @@ function go(){
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
       document.getElementById('lns').textContent='流年十神：'+ln.ss;
-      var lnDescs={比肩:'今年自我意识增强，适合独立发展。',劫财:'今年花销较大，注意理财。',食神:'今年创造力旺盛，生活愉悦。',伤官:'今年思维活跃但口舌多，宜低调。',偏财:'今年偏财运佳，可适度投资。',正财:'今年正财稳定，适合置业。',七杀:'今年压力较大，有贵人暗中相助。',正官:'今年贵人运强，利晋升。',偏印:'今年学习运佳，适合进修。',正印:'今年思路清晰，学业工作顺利。'};
+      var lnDescs={比肩:'今年自我意识抬头，适合独立推进一些事情。不必太在意别人怎么看你，按自己的节奏走就好。但注意：独行不等于孤立，适当借力会让路走得更顺。',劫财:'今年花钱的地方会比较多——可能是投资、健康、或是意料之外的开支。提前做好财务规划，留一部分备用金，别让钱的问题影响心情。',食神:'今年整体状态会比较愉快，创造力和感受力都在线。适合学点新东西，发展兴趣爱好，也适合在生活上给自己一点小确幸。',伤官:'今年脑子特别活，点子多，但也容易说太多或想太多。口舌是非是这一年的高发区——说话前多停三秒，能避开不少麻烦。',偏财:'今年偏财运不错，可能是副业、投资或意外收入。但记住：机会好的时候也是最容易冲动的时候，设好止损线再出手。',正财:'今年正财稳定，适合做置业、储蓄、长期理财等规划。工作上如果有机会谈薪资或合作条件，今年是开口的好时机。',七杀:'今年压力不小，可能是工作、竞争或来自权威的施压。但别慌——七杀压顶往往是突破前的信号。你的魄力今年是你最大的武器。',正官:'今年贵人运强，做事容易得到认可和帮助。如果有晋升、合作、考编的机会今年值得积极争取。遇到难处时记得主动开口，别人愿意拉你一把。',偏印:'今年学习运不错，适合进修、学新技能、或者考个证书。也适合做一些需要深度思考的复盘工作，为下一步打好基础。',正印:'今年思路清晰，学业和工作都比较顺。适合把之前积累的东西整理输出——写文章、做分享、梳理经验。今年你说出的话比平时更有分量。'};
       document.getElementById('lnd').innerHTML='<div class="ln-item">'+(lnDescs[ln.ss]||'流年平稳。')+'</div><div class="ln-item">流年五行属'+GE[ln.gi]+'，与日主关系'+ln.ss+'。</div><div class="ln-item">建议：多亲近'+ys.xi.join('、')+'，远离'+ys.ji.join('、')+'。</div>';
       var sha=getAllShenSha(dayS,pils);
       document.getElementById('shg').innerHTML=sha.map(function(s){return'<div class="sha-item '+(s.type==='吉'?'ji':'xiong')+'"><div class="sha-name">'+s.name+'</div><span class="sha-type '+(s.type==='吉'?'ji-t':'xiong-t')+'">'+s.type+'</span><div class="sha-meaning">'+s.desc+'</div></div>';}).join('');
@@ -855,6 +855,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
