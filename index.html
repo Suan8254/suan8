@@ -273,7 +273,29 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
 .reading-title{font-family:'LXGW WenKai',serif;font-size:.9rem;font-weight:700;margin-bottom:8px;letter-spacing:2px}
 .reading-text{font-size:.82rem;line-height:1.7;color:var(--songyan)}
 
-/* Actions */
+/* Marriage */
+.mar-box{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.mar-row{display:flex;justify-content:space-between;padding:10px 14px;background:rgba(42,36,32,.03);border-radius:8px}
+.mar-label{font-size:.75rem;color:var(--songyan);letter-spacing:2px}
+.mar-value{font-family:'LXGW WenKai',serif;font-weight:700}
+/* Career */
+.cr-section{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.cr-row{display:flex;align-items:center;gap:10px}
+.cr-label{flex:0 0 70px;font-size:.72rem;color:var(--songyan);letter-spacing:2px}
+.cr-bar-wrap{flex:1;height:8px;background:rgba(42,36,32,.06);border-radius:4px;overflow:hidden}
+.cr-bar{height:100%;border-radius:4px;transition:width 1s ease}
+.cr-apt-list{font-size:.82rem;margin-bottom:14px;line-height:1.6}
+/* Health */
+.hl-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hl-label{flex:0 0 70px;font-size:.72rem;color:var(--songyan);letter-spacing:2px}
+.hl-bar-wrap{flex:1;height:10px;background:rgba(42,36,32,.06);border-radius:5px;overflow:hidden}
+.hl-bar{height:100%;background:var(--mu);border-radius:5px;transition:width 1s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:.62rem;color:#fff;font-weight:700}
+.hl-organs{margin-bottom:14px;font-size:.82rem}
+/* YiJing */
+.yj-box{padding:4px 0}
+.yj-input{width:100%;padding:11px 14px;font-size:.9rem;border:1px solid var(--paper);border-radius:8px;background:#fff;margin-bottom:10px;font-family:'Noto Sans SC',sans-serif}
+.yj-input:focus{outline:none;border-color:var(--zhusha)}
+
 .actions{display:flex;gap:12px;justify-content:center;margin-top:40px;flex-wrap:wrap}
 .action-btn{
   padding:12px 28px;font-size:.88rem;border-radius:8px;cursor:pointer;
@@ -378,6 +400,21 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
 
   <!-- 9. Shen Sha -->
   <div class="section fade-in s9"><div class="section-title">神 煞 系 统</div><div class="ss-grid" id="shg"></div></div>
+
+  <!-- 9b. Marriage -->
+  <div class="section fade-in s9"><div class="section-title">婚 姻 详 解</div><div class="mar-box"><div class="mar-row"><span class="mar-label">配偶星</span><span class="mar-value" id="mrr-spouse">—</span></div><div class="mar-row"><span class="mar-label">最佳婚龄</span><span class="mar-value" id="mrr-age">—</span></div></div><div class="ln-detail" id="mrr-notes"></div></div>
+
+  <!-- 9c. Career -->
+  <div class="section fade-in s9"><div class="section-title">事 业 · 财 富</div><div class="cr-section"><div class="cr-row"><div class="cr-label">事业适性</div><div class="cr-bar-wrap"><div class="cr-bar" id="cr-apt-bar" style="width:70%;background:var(--mu)"></div></div></div><div class="cr-row"><div class="cr-label">财富指数</div><div class="cr-bar-wrap"><div class="cr-bar" id="cr-wlt-bar" style="width:65%;background:var(--jin)"></div></div></div></div><div class="cr-apt-list"><b>推荐行业：</b><span id="cr-apt">—</span></div><div class="ln-detail" id="cr-notes"></div></div>
+
+  <!-- 9d. Health -->
+  <div class="section fade-in s9"><div class="section-title">健 康 养 生</div><div class="hl-header"><div class="hl-label">健康指数</div><div class="hl-bar-wrap"><div class="hl-bar" id="hl-bar" style="width:80%"></div></div></div><div class="hl-organs"><b>需注意器官：</b><span id="hl-organs">—</span></div><div class="ln-detail" id="hl-notes"></div></div>
+
+  <!-- 9e. Liu Ren -->
+  <div class="section fade-in s9"><div class="section-title">今 日 小 六 壬</div><div id="liuren-result" style="text-align:center"><div style="padding:12px;color:var(--songyan);font-size:.85rem">点击下方按钮获取今日速断</div></div><button class="submit-btn" style="margin-top:12px;background:var(--zhusha);font-size:.88rem;letter-spacing:2px" onclick="doLiuRen()">看今日运势</button></div>
+
+  <!-- 9f. YiJing -->
+  <div class="section fade-in s9"><div class="section-title">易 经 占 卜</div><div class="yj-box"><input type="text" id="yijing-question" placeholder="心中默念问题，然后点击起卦" class="yj-input"><button class="submit-btn" style="background:var(--mo);font-size:.88rem" onclick="doYiJing()">🧘 起 卦</button><div id="yijing-result" style="margin-top:16px"></div></div></div>
 
   <!-- 10. Detailed Readings -->
   <div class="section fade-in s9"><div class="section-title">命 理 详 断</div><div class="reading-grid" id="rdg"></div></div>
@@ -762,6 +799,7 @@ function shareR(){if(navigator.share)navigator.share({title:'命理通·八字�
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 
 </script>
+
 
 </body>
 </html>
