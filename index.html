@@ -478,7 +478,18 @@ function countEl(ps){var c={木:0,火:0,土:0,金:0,水:0};ps.forEach(function(p
 function dmStrength(dgi,el){var me=GE[dgi],s=0,d=0;['木','水'].forEach(function(e){s+=el[e]});['火','土','金'].forEach(function(e){d+=el[e]});return s>=d?'旺':'弱';}
 function countShiShen(dayS,pils){var ss={比肩:0,劫财:0,食神:0,伤官:0,偏财:0,正财:0,七杀:0,正官:0,偏印:0,正印:0};pils.forEach(function(p,i){if(i===2)return;ss[getShiShen(dayS,p.s)]++;var cg=ZCG[p.b];if(cg)cg.forEach(function(g){ss[getShiShen(dayS,g)]++});});return ss;}
 function getGeJu(ms){return{正官:'正官格',七杀:'七杀格',正印:'正印格',偏印:'偏印格',正财:'正财格',偏财:'偏财格',食神:'食神格',伤官:'伤官格',比肩:'建禄格',劫财:'羊刃格'}[ms]||'杂气格';}
-function getYongShen(dEl,str){var r={木:{旺:{xi:['火','土'],ji:['水','木']},弱:{xi:['水','木'],ji:['金','火']}},火:{旺:{xi:['土','金'],ji:['木','火']},弱:{xi:['木','火'],ji:['水','土']}},土:{旺:{xi:['金','水'],ji:['火','土']},弱:{xi:['火','土'],ji:['木','水']}},金:{旺:{xi:['水','木'],ji:['土','金']},弱:{xi:['土','金'],ji:['火','水']}},水:{旺:{xi:['木','火'],ji:['金','水']},弱:{xi:['金','水'],ji:['土','火']}}};return r[dEl][str];}
+function getYongShen(dEl,str,el){
+  // Strong day master: use泄 (食伤) and耗 (财), avoid生扶 (印比)
+  // Weak day master: use生 (印) and助 (比劫), avoid泄耗 (食伤财)
+  var r={木:{旺:{xi:['火','土'],ji:['水','木']},弱:{xi:['水','木'],ji:['金','火']}},火:{旺:{xi:['土','金'],ji:['木','火']},弱:{xi:['木','火'],ji:['水','土']}},土:{旺:{xi:['金','水'],ji:['火','土']},弱:{xi:['火','土'],ji:['木','水']}},金:{旺:{xi:['水','木'],ji:['土','金']},弱:{xi:['土','金'],ji:['火','水']}},水:{旺:{xi:['木','火'],ji:['金','水']},弱:{xi:['金','水'],ji:['土','火']}}};
+  var base=r[dEl][str];
+  // If an element is completely missing from the chart, its assisting element is critical
+  var missing=[];['木','火','土','金','水'].forEach(function(e){if(el[e]===0)missing.push(e);});
+  var xi=base.xi.slice();var ji=base.ji.slice();
+  if(missing.indexOf('水')>=0&&xi.indexOf('金')<0&&str==='弱')xi.splice(1,0,'金');
+  if(missing.indexOf('木')>=0&&xi.indexOf('水')<0&&str==='弱')xi.splice(1,0,'水');
+  return{xi:xi,ji:ji,missing:missing,explanation:str==='旺'?'身旺宜泄不宜补：用'+xi.join('、')+'来平衡，忌'+ji.join('、')+'。':'身弱需生扶：用'+xi.join('、')+'来补气，忌'+ji.join('、')+'。'+(missing.length>0?'命局缺'+missing.join('、')+'，是命局的短板所在。':'')};
+}
 function getDaYun(ygi,mgi,mzi,g){var dir=((GY[ygi]==='阳'&&g==='男')||(GY[ygi]==='阴'&&g==='女'))?1:-1,dy=[];for(var i=0;i<8;i++){dy.push({step:i+1,s:TG[(mgi+(i+1)*dir)%10],b:DZ[(mzi+(i+1)*dir)%12],startAge:3+i*10,endAge:12+i*10});}return dy;}
 function getLiuNian(year,dayS){var gi=(year-4)%10,zi=(year-4)%12;return{gz:TG[gi]+DZ[zi],ss:getShiShen(dayS,TG[gi]),gi:gi,zi:zi};}
 
@@ -855,6 +866,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
