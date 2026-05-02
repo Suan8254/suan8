@@ -479,6 +479,7 @@ function dmStrength(dgi,el){var me=GE[dgi],s=0,d=0;['木','水'].forEach(functio
 function countShiShen(dayS,pils){var ss={比肩:0,劫财:0,食神:0,伤官:0,偏财:0,正财:0,七杀:0,正官:0,偏印:0,正印:0};pils.forEach(function(p,i){if(i===2)return;ss[getShiShen(dayS,p.s)]++;var cg=ZCG[p.b];if(cg)cg.forEach(function(g){ss[getShiShen(dayS,g)]++});});return ss;}
 function getGeJu(ms){return{正官:'正官格',七杀:'七杀格',正印:'正印格',偏印:'偏印格',正财:'正财格',偏财:'偏财格',食神:'食神格',伤官:'伤官格',比肩:'建禄格',劫财:'羊刃格'}[ms]||'杂气格';}
 function getYongShen(dEl,str,el){
+  el=el||{};
   // Strong day master: use泄 (食伤) and耗 (财), avoid生扶 (印比)
   // Weak day master: use生 (印) and助 (比劫), avoid泄耗 (食伤财)
   var r={木:{旺:{xi:['火','土'],ji:['水','木']},弱:{xi:['水','木'],ji:['金','火']}},火:{旺:{xi:['土','金'],ji:['木','火']},弱:{xi:['木','火'],ji:['水','土']}},土:{旺:{xi:['金','水'],ji:['火','土']},弱:{xi:['火','土'],ji:['木','水']}},金:{旺:{xi:['水','木'],ji:['土','金']},弱:{xi:['土','金'],ji:['火','水']}},水:{旺:{xi:['木','火'],ji:['金','水']},弱:{xi:['金','水'],ji:['土','火']}}};
@@ -866,6 +867,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
