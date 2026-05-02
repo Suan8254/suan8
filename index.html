@@ -816,7 +816,7 @@ function go(){
       document.getElementById('pil').innerHTML=pils.map(function(p,i){var se=GE[p.gi],be=ZE[p.zi],ss=i===2?'日主':getShiShen(dayS,p.s),cg=ZCG[p.b]||[];return'<div class="pillar" ontouchstart="onPillarDown(event,'+i+')" ontouchend="onPillarUp()" ontouchcancel="onPillarUp()" oncontextmenu="event.preventDefault();showTT('+i+')"><div class="info-btn" onclick="event.stopPropagation();showTT('+i+')">?</div><div class="p-label">'+labels[i]+'</div><div class="p-stem" style="color:var(--'+getElVar(se)+')">'+p.s+'</div><div class="p-branch" style="color:var(--'+getElVar(be)+')">'+p.b+'</div><div class="p-shishen">'+ss+'</div><span class="tag el-'+se+'">'+se+'</span><div class="p-canggan">藏 '+(cg.length?cg.join(' '):'')+'</div></div>';}).join('');
       var mx=Math.max.apply(null,EN.map(function(n){return el[n]}))||1;
       document.getElementById('elb').innerHTML=EN.map(function(n){return'<div class="el-item"><div class="el-track"><div class="el-fill" style="height:'+(el[n]/mx*100)+'%;background:var(--'+getElVar(n)+')"></div></div><div class="el-name">'+n+'</div><div class="el-cnt">'+el[n]+'</div></div>';}).join('');
-      var ssCount=countShiShen(dayS,pils),monthSS=getShiShen(dayS,mp.s),geju=getGeJu(monthSS),ys=getYongShen(dEl,str);
+      var ssCount=countShiShen(dayS,pils),monthSS=getShiShen(dayS,mp.s),geju=getGeJu(monthSS),ys=getYongShen(dEl,str,el);
       var pers=buildPersonality(dayS,str,ssCount,el,geju);
       document.getElementById('dmc').textContent=dayS;
       document.getElementById('dmc').style.color='var(--'+getElVar(dEl)+')';
@@ -866,6 +866,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
