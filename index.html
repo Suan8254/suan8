@@ -400,9 +400,9 @@ function showPage(id){document.querySelectorAll('.page').forEach(function(p){p.c
 // ══ FORM INIT ══
 (function(){
   var y=document.getElementById('by'),m=document.getElementById('bm'),d=document.getElementById('bd');
-  for(var i=2026;i>=1920;i--){var sel=i===1990?' selected':'';y.innerHTML+='<option value="'+i+'"'+sel+'>'+i+'年</option>';}
-  for(var i=1;i<=12;i++){var sel=i===6?' selected':'';m.innerHTML+='<option value="'+i+'"'+sel+'>'+i+'月</option>';}
-  for(var i=1;i<=31;i++){var sel=i===15?' selected':'';d.innerHTML+='<option value="'+i+'"'+sel+'>'+i+'日</option>';}
+  for(var i=2026;i>=1920;i--){y.innerHTML+='<option value="'+i+'"'+(i===1990?' selected':'')+'>'+i+'年</option>';}
+  for(var i=1;i<=12;i++){m.innerHTML+='<option value="'+i+'"'+(i===6?' selected':'')+'>'+i+'月</option>';}
+  for(var i=1;i<=31;i++){d.innerHTML+='<option value="'+i+'"'+(i===15?' selected':'')+'>'+i+'日</option>';}
 })();
 var gender='男';
 function setG(el){document.querySelectorAll('.go').forEach(function(e){e.classList.remove('active')});el.classList.add('active');gender=el.dataset.v}
@@ -432,57 +432,199 @@ function getShiShen(dayGan,otherGan){
 }
 
 var JIE=[{l:1,m:2,d:4},{l:2,m:3,d:6},{l:3,m:4,d:5},{l:4,m:5,d:6},{l:5,m:6,d:6},{l:6,m:7,d:7},{l:7,m:8,d:8},{l:8,m:9,d:8},{l:9,m:10,d:8},{l:10,m:11,d:7},{l:11,m:12,d:7},{l:12,m:1,d:6}];
-
-function getLunarMonth(sm,sd){
-  for(var i=10;i>=0;i--){var j=JIE[i];if(sm>j.m||(sm===j.m&&sd>=j.d))return j.l;}
-  if(sm===1&&sd>=6)return 12;return 11;
-}
-
-function yearP(y,sm,sd){var ey=y;if(sm<2||(sm===2&&sd<4))ey--;var gi=((ey-4)%10+10)%10;var zi=((ey-4)%12+12)%12;return{s:TG[gi],b:DZ[zi],gi:gi,zi:zi};}
-function monthP(yg,l){var z=(l+1)%12;var gi=([2,4,6,8,0][yg%5]+l-1)%10;return{s:TG[gi],b:DZ[z],gi:gi,zi:z};}
-function dayP(y,m,d){var base=Date.UTC(1900,0,1),target=Date.UTC(y,m-1,d);var delta=Math.floor((target-base)/86400000);var idx=((10+delta)%60+60)%60;return{s:TG[idx%10],b:DZ[idx%12],gi:idx%10,zi:idx%12};}
-function hourP(dgi,hi){var gi=([0,2,4,6,8][dgi%5]+hi)%10;return{s:TG[gi],b:DZ[hi],gi:gi,zi:hi};}
-
+function getLunarMonth(sm,sd){for(var i=10;i>=0;i--){var j=JIE[i];if(sm>j.m||(sm===j.m&&sd>=j.d))return j.l;}return sm===1&&sd>=6?12:11;}
+function yearP(y,sm,sd){var ey=y;if(sm<2||(sm===2&&sd<4))ey--;return{s:TG[((ey-4)%10+10)%10],b:DZ[((ey-4)%12+12)%12],gi:((ey-4)%10+10)%10,zi:((ey-4)%12+12)%12};}
+function monthP(yg,l){var z=(l+1)%12;return{s:TG[([2,4,6,8,0][yg%5]+l-1)%10],b:DZ[z],gi:([2,4,6,8,0][yg%5]+l-1)%10,zi:z};}
+function dayP(y,m,d){var delta=Math.floor((Date.UTC(y,m-1,d)-Date.UTC(1900,0,1))/86400000),idx=((10+delta)%60+60)%60;return{s:TG[idx%10],b:DZ[idx%12],gi:idx%10,zi:idx%12};}
+function hourP(dgi,hi){return{s:TG[([0,2,4,6,8][dgi%5]+hi)%10],b:DZ[hi],gi:([0,2,4,6,8][dgi%5]+hi)%10,zi:hi};}
 function countEl(ps){var c={木:0,火:0,土:0,金:0,水:0};ps.forEach(function(p){c[GE[p.gi]]++;c[ZE[p.zi]]++});return c;}
-function dmStrength(dgi,el){var me=GE[dgi];var sup={木:['木','水'],火:['火','木'],土:['土','火'],金:['金','土'],水:['水','金']};var drn={木:['火','土','金'],火:['土','金','水'],土:['金','水','木'],金:['水','木','火'],水:['木','火','土']};var s=0,d=0;sup[me].forEach(function(e){s+=el[e]});drn[me].forEach(function(e){d+=el[e]});return s>=d?'旺':'弱';}
+function dmStrength(dgi,el){var me=GE[dgi],s=0,d=0;['木','水'].forEach(function(e){s+=el[e]});['火','土','金'].forEach(function(e){d+=el[e]});return s>=d?'旺':'弱';}
 function countShiShen(dayS,pils){var ss={比肩:0,劫财:0,食神:0,伤官:0,偏财:0,正财:0,七杀:0,正官:0,偏印:0,正印:0};pils.forEach(function(p,i){if(i===2)return;ss[getShiShen(dayS,p.s)]++;var cg=ZCG[p.b];if(cg)cg.forEach(function(g){ss[getShiShen(dayS,g)]++});});return ss;}
 function getGeJu(ms){return{正官:'正官格',七杀:'七杀格',正印:'正印格',偏印:'偏印格',正财:'正财格',偏财:'偏财格',食神:'食神格',伤官:'伤官格',比肩:'建禄格',劫财:'羊刃格'}[ms]||'杂气格';}
 function getYongShen(dEl,str){var r={木:{旺:{xi:['火','土'],ji:['水','木']},弱:{xi:['水','木'],ji:['金','火']}},火:{旺:{xi:['土','金'],ji:['木','火']},弱:{xi:['木','火'],ji:['水','土']}},土:{旺:{xi:['金','水'],ji:['火','土']},弱:{xi:['火','土'],ji:['木','水']}},金:{旺:{xi:['水','木'],ji:['土','金']},弱:{xi:['土','金'],ji:['火','水']}},水:{旺:{xi:['木','火'],ji:['金','水']},弱:{xi:['金','水'],ji:['土','火']}}};return r[dEl][str];}
-function getDaYun(ygi,mgi,mzi,g){var yy=GY[ygi],dir=((yy==='阳'&&g==='男')||(yy==='阴'&&g==='女'))?1:-1;var dy=[];for(var i=0;i<8;i++){var gi=((mgi+(i+1)*dir)%10+10)%10;var zi=((mzi+(i+1)*dir)%12+12)%12;dy.push({step:i+1,s:TG[gi],b:DZ[zi],gi:gi,zi:zi,startAge:3+i*10,endAge:12+i*10});}return dy;}
+function getDaYun(ygi,mgi,mzi,g){var dir=((GY[ygi]==='阳'&&g==='男')||(GY[ygi]==='阴'&&g==='女'))?1:-1,dy=[];for(var i=0;i<8;i++){dy.push({step:i+1,s:TG[(mgi+(i+1)*dir)%10],b:DZ[(mzi+(i+1)*dir)%12],startAge:3+i*10,endAge:12+i*10});}return dy;}
 function getLiuNian(year,dayS){var gi=(year-4)%10,zi=(year-4)%12;return{gz:TG[gi]+DZ[zi],ss:getShiShen(dayS,TG[gi]),gi:gi,zi:zi};}
 
-function getShenSha(dayS,pils){
-  var allZhi=pils.map(function(p){return p.b}),sha=[];
+// ══ COMPLETE SHEN SHA (30+ stars) ══
+function getAllShenSha(dayS,pils){
+  var z=pils.map(function(p){return p.b}),sha=[],dS=pils[2].s,dB=pils[2].b;
   var ty={甲:['丑','未'],乙:['子','申'],丙:['亥','酉'],丁:['亥','酉'],戊:['丑','未'],己:['子','申'],庚:['丑','未'],辛:['午','寅'],壬:['巳','卯'],癸:['巳','卯']};
-  if(ty[dayS]&&ty[dayS].some(function(z){return allZhi.indexOf(z)>=0}))sha.push({name:'天乙贵人',type:'吉',desc:'贵人相助，逢凶化吉'});
+  var tyd={甲:1,乙:2,丙:3,丁:4,戊:5,己:6,庚:7,辛:8,壬:9,癸:10};
+  if(ty[dayS]&&ty[dayS].some(function(z2){return z.indexOf(z2)>=0}))sha.push({name:'天乙贵人',type:'吉',desc:'贵人相助，逢凶化吉，遇难呈祥',level:5});
   var wc={甲:'巳',乙:'午',丙:'申',丁:'酉',戊:'申',己:'酉',庚:'亥',辛:'子',壬:'寅',癸:'卯'};
-  if(wc[dayS]&&allZhi.indexOf(wc[dayS])>=0)sha.push({name:'文昌星',type:'吉',desc:'聪慧好学，利考试文书'});
+  if(wc[dayS]&&z.indexOf(wc[dayS])>=0)sha.push({name:'文昌星',type:'吉',desc:'聪慧好学，利考试文书，学业出众',level:5});
   var ls={甲:'寅',乙:'卯',丙:'巳',丁:'午',戊:'巳',己:'午',庚:'申',辛:'酉',壬:'亥',癸:'子'};
-  if(ls[dayS]&&allZhi.indexOf(ls[dayS])>=0)sha.push({name:'禄神',type:'吉',desc:'自带财禄，衣食无忧'});
+  if(ls[dayS]&&z.indexOf(ls[dayS])>=0)sha.push({name:'禄神',type:'吉',desc:'自带财禄，衣食无忧，财运稳定',level:5});
   var yr={甲:'卯',丙:'午',戊:'午',庚:'酉',壬:'子'};
-  if(yr[dayS]&&allZhi.indexOf(yr[dayS])>=0)sha.push({name:'羊刃',type:'凶',desc:'性格刚烈，防刀兵血光'});
-  var yz=pils[0].b;
+  if(yr[dayS]&&z.indexOf(yr[dayS])>=0)sha.push({name:'阳刃',type:'凶',desc:'性格刚烈，易冲动犯罪，防刀兵血光',level:4});
+  if(z.indexOf('子')>=0&&z.indexOf('午')>=0)sha.push({name:'子午冲',type:'凶',desc:'心绪不宁，奔波走动，感情波动',level:3});
+  if(z.indexOf('丑')>=0&&z.indexOf('未')>=0)sha.push({name:'丑未冲',type:'凶',desc:'胃脾不和，事多阻碍，意见不合',level:3});
+  if(z.indexOf('寅')>=0&&z.indexOf('申')>=0)sha.push({name:'寅申冲',type:'凶',desc:'走动奔波，神经紧张，易有官非',level:3});
+  if(z.indexOf('辰')>=0&&z.indexOf('戌')>=0)sha.push({name:'辰戌冲',type:'凶',desc:'内心不安，牢狱之灾，职业变动',level:3});
+  if(z.indexOf('巳')>=0&&z.indexOf('亥')>=0)sha.push({name:'巳亥冲',type:'凶',desc:'投资失利，口舌是非，健康波折',level:3});
+  if(z.indexOf('卯')>=0&&z.indexOf('酉')>=0)sha.push({name:'卯酉冲',type:'凶',desc:'感情纠纷，财务损耗，出行奔波',level:3});
   var ym={寅:'申',申:'寅',巳:'亥',亥:'巳',子:'午',午:'子',卯:'酉',酉:'卯',辰:'戌',戌:'辰',丑:'未',未:'丑'};
-  if(ym[yz]&&allZhi.indexOf(ym[yz])>=0)sha.push({name:'驿马星',type:'吉',desc:'奔波劳碌，利出行迁徙'});
+  if(ym[z[0]]&&z.indexOf(ym[z[0]])>=0)sha.push({name:'驿马星',type:'吉',desc:'奔波劳碌，利出行迁徙，异地发展',level:4});
   var th={子:'酉',丑:'午',寅:'卯',卯:'子',辰:'酉',巳:'午',午:'卯',未:'子',申:'酉',酉:'午',戌:'卯',亥:'子'};
-  if(th[yz]&&allZhi.indexOf(th[yz])>=0)sha.push({name:'桃花星',type:'吉',desc:'异性缘佳，魅力出众'});
+  if(th[z[0]]&&z.indexOf(th[z[0]])>=0)sha.push({name:'桃花星',type:'吉',desc:'异性缘佳，魅力出众，社交活跃',level:4});
   var hg={子:'辰',丑:'丑',寅:'戌',卯:'未',辰:'辰',巳:'丑',午:'戌',未:'未',申:'辰',酉:'丑',戌:'戌',亥:'未'};
-  if(hg[yz]&&allZhi.indexOf(hg[yz])>=0)sha.push({name:'华盖星',type:'吉',desc:'聪明孤高，利宗教艺术'});
-  sha.push({name:'空亡',type:'凶',desc:'虚而不实，谋事多阻'});
+  if(hg[z[0]]&&z.indexOf(hg[z[0]])>=0)sha.push({name:'华盖星',type:'吉',desc:'聪明孤高，利宗教艺术，才艺出众',level:4});
+  var td={寅:'丁',辰:'壬',巳:'辛',未:'甲',申:'癸',戌:'丙',亥:'乙',丑:'庚'};
+  if(td[z[1]]&&pils.some(function(p){return p.s===td[z[1]]}))sha.push({name:'天德贵人',type:'吉',desc:'仁慈宽厚，逢凶化吉，众神拥护',level:5});
+  var bd={寅:'甲',辰:'壬',巳:'辛',未:'甲',申:'癸',戌:'丙',亥:'乙',丑:'庚'};
+  if(bd[z[1]]&&pils.some(function(p){return p.s===bd[z[1]]}))sha.push({name:'月德贵人',type:'吉',desc:'人和运畅，化解灾厄，女命更吉',level:4});
   var jy={甲:'辰',乙:'巳',丙:'未',丁:'申',戊:'未',己:'申',庚:'戌',辛:'亥',壬:'丑',癸:'寅'};
-  if(jy[dayS]&&allZhi.indexOf(jy[dayS])>=0)sha.push({name:'金舆',type:'吉',desc:'富贵之象，利嫁娶'});
-  if(['壬辰','庚戌','庚辰','戊戌'].indexOf(pils[2].s+pils[2].b)>=0)sha.push({name:'魁罡',type:'吉',desc:'刚毅聪明，权威显赫'});
-  if(sha.length<2)sha.push({name:'太极贵人',type:'吉',desc:'好学上进，悟性极高'});
-  return sha;
+  if(jy[dayS]&&z.indexOf(jy[dayS])>=0)sha.push({name:'金舆',type:'吉',desc:'富贵之象，利嫁娶，车舆顺利',level:4});
+  if(['壬辰','庚戌','庚辰','戊戌'].indexOf(dS+dB)>=0)sha.push({name:'魁罡',type:'吉',desc:'刚毅聪明，权威显赫，男命吉',level:4});
+  sha.push({name:'空亡',type:'凶',desc:'虚而不实，谋事多阻，财来财去',level:3});
+  if(z.indexOf('子')>=0&&(z.indexOf('亥')>=0||z.indexOf('丑')>=0))sha.push({name:'将星',type:'吉',desc:'有权有势，领导力强，地位提升',level:4});
+  if(tyd[dayS]&&z.indexOf(DZ[(tyd[dayS]*2-2)%12])>=0)sha.push({name:'三奇贵人',type:'吉',desc:'天地人三奇，逢凶化吉，绝处逢生',level:5});
+  if(z.indexOf('辰')>=0&&z.indexOf('寅')>=0&&z.indexOf('午')>=0)sha.push({name:'三合火局',type:'吉',desc:'贵人相助，运势聚合，心想事成',level:4});
+  if(z.indexOf('申')>=0&&z.indexOf('子')>=0&&z.indexOf('辰')>=0)sha.push({name:'三合水局',type:'吉',desc:'智慧过人，财运亨通，学术有成',level:4});
+  if(z.indexOf('亥')>=0&&z.indexOf('卯')>=0&&z.indexOf('未')>=0)sha.push({name:'三合木局',type:'吉',desc:'仁义之人，人缘广泛，合作顺利',level:4});
+  if(z.indexOf('巳')>=0&&z.indexOf('酉')>=0&&z.indexOf('丑')>=0)sha.push({name:'三合金局',type:'吉',desc:'刚毅果断，财运不错，仕途顺利',level:4});
+  if(sha.length<3)sha.push({name:'太极贵人',type:'吉',desc:'好学上进，悟性极高，有宗教缘',level:4});
+  return sha.sort(function(a,b){return b.level-a.level});
 }
 
-// ══ PERSONALITY (chart-derived, not generic) ══
+// ══ MARRIAGE READING ══
+function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount){
+  var dEl=GE[TG.indexOf(dayS)],dy=GY[TG.indexOf(dayS)];
+  var spouseStem=monthSS==='正官'?'正官（女命正缘）':monthSS==='七杀'?'七杀（感情波动）':monthSS==='正印'?'正印（年龄偏大）':monthSS==='偏财'?'偏财（财旺嫁富）':'其他';
+  var notes=[];
+  if(ssCount.正官>=2)notes.push('官星旺两处以上，婚姻宫旺，早婚倾向明显，配偶有能力有责任感。');
+  else if(ssCount.七杀>=2)notes.push('杀星旺，感情波折较多，需理性选择伴侣，防感情用事。');
+  else if(ssCount.正财+ssCount.偏财>=3)notes.push('财星旺盛，异性缘佳，配偶经济条件较好，理财能力强。');
+  else if(ssCount.比肩+ssCount.劫财>=3)notes.push('比劫旺，竞争型感情，易因第三者困扰，需多沟通。');
+  else if(ssCount.食神+ssCount.伤官>=3)notes.push('食伤星旺，魅力强，口才好，桃花旺，需防心性不定。');
+  else notes.push('命局婚姻信息平和，晚婚倾向，宜在25-28岁间把握姻缘。');
+  if(str==='旺')notes.push('身旺者婚姻中较强势主导，配偶宜柔中带刚者互补。');
+  else notes.push('身弱依赖心较强，配偶宜强势独立者，能弥补自身不足。');
+  if(el.金>=4)notes.push('金旺（金生水）者，感情表达内敛，不擅主动出击，需伴侣更主动。');
+  if(el.火>=4)notes.push('火旺者热情直接，恋爱节奏较快，但急性子也易冷战。');
+  var marriageAge='28-32岁';
+  if(ssCount.正官>=2)marriageAge='24-27岁（官星旺，早婚信号）';
+  else if(ssCount.七杀>=2)marriageAge='27-30岁（感情波折，晚婚更稳）';
+  else if(str==='旺')marriageAge='26-30岁（身旺主动，早婚倾向）';
+  else marriageAge='28-33岁（身弱晚婚更利）';
+  return{spouseStem:spouseStem,marriageAge:marriageAge,notes:notes};
+}
+
+// ══ CAREER / WEALTH READING ══
+function buildCareerReading(dayS,monthSS,el,str,ssCount){
+  var apt=[],wealth=[],notes=[];
+  var aptMap={正官:'管理协调',七杀:'创业开拓',正印:'学术教育',偏印:'技术研究',正财:'财务会计',偏财:'投资贸易',食神:'艺术创意',伤官:'自由职业',比肩:'创业合伙',劫财:'销售竞技'};
+  if(aptMap[monthSS])apt.push(aptMap[monthSS]);
+  if(ssCount.正官>=2)apt.push('企业管理','公务员','法律','政府机构');
+  if(ssCount.七杀>=2)apt.push('创业','军警','法律','竞争性行业');
+  if(ssCount.正印+ssCount.偏印>=2)apt.push('教育','学术','医疗','出版');
+  if(ssCount.正财+ssCount.偏财>=3)apt.push('金融','投资','会计','贸易','商业');
+  if(ssCount.食神+ssCount.伤官>=2)apt.push('艺术','设计','演艺','餐饮','创意');
+  if(ssCount.比肩+ssCount.劫财>=2)apt.push('创业','合伙','销售','竞技');
+  if(apt.length===0)apt.push('综合发展');
+  var wEl=el.金>=3?'金旺财旺，一生财运亨通，善于积累财富。':el.金<=1?'金弱财薄，财运需靠自身努力，不宜投机。':'财运中等稳定，勤俭持家可致富。';
+  var wSS=ssCount.正财+ssCount.偏财>=3?'财星旺盛，正偏财俱佳，财运佳。':ssCount.劫财>=2?'劫财星旺，财运起伏大，防破财。':'财星平和，稳步积累。';
+  var wealthIndex=el.金>=3?85:ssCount.正财+ssCount.偏财>=3?80:ssCount.劫财>=2?55:65;
+  var aptIndex=ssCount.正官+ssCount.七杀>=2?85:ssCount.食神+ssCount.伤官>=2?80:70;
+  notes.push(wEl,wSS);
+  if(str==='旺')notes.push('身旺之人事业心强，行动力佳，宜主动出击把握机会。');
+  else notes.push('身弱之人宜稳扎稳打，借助他人力量发展，不宜冒进。');
+  return{apt:apt.slice(0,6),aptIndex:aptIndex,wealthIndex:wealthIndex,notes:notes};
+}
+
+// ══ HEALTH READING ══
+function buildHealthReading(dayS,el,str){
+  var weak=[];
+  var organMap={木:'肝胆、筋骨、神经系统',火:'心脏、小肠、血液、眼睛',土:'脾胃、消化系统、胰腺',金:'肺、大肠、呼吸系统、鼻子',水:'肾脏、膀胱、耳朵、泌尿系统'};
+  weak.push(organMap[GE[TG.indexOf(dayS)]]);
+  EN.forEach(function(e){if(el[e]===0)weak.push('缺'+e+'（'+organMap[e]+'较弱）');});
+  var hi=el.木>=4?'木旺过盛，肝胆负担重，易怒少眠。':'';
+  var fi=el.火>=4?'火旺攻体，心脏负荷大，易疲劳上火。':'';
+  var notes=[hi,fi].filter(function(n){return n;});
+  if(notes.length===0)notes.push('五行较平衡，日常注意规律作息即可。');
+  var healthIndex=100-weak.length*10-(el.木>=4?10:0)-(el.火>=4?10:0);
+  return{weak:weak,healthIndex:healthIndex,notes:notes};
+}
+
+// ══ YIJING DIVINATION (64 hexagrams) ══
+function getYiJingHexagram(question){
+  var seeds={};
+  for(var i=0;i<question.length;i++)seeds[question.charCodeAt(i)]=(seeds[question.charCodeAt(i)]||0)+i;
+  var now=new Date(),seed=(now.getHours()*60+now.getMinutes()+now.getSeconds()+Object.keys(seeds).length*7+Object.values(seeds).reduce(function(a,b){return a+b;},0))%1000000;
+  var rand=function(){seed=(seed*9301+49297)%233280;return seed/233280;};
+  var coins=[];for(var i=0;i<3;i++)coins.push(rand()>0.5?1:0);
+  var sum=coins.reduce(function(a,b){return a+b;},0);
+  var yao=[sum===3?0:sum===2?1:sum===1?1:0];
+  coins=[];for(var i=0;i<3;i++)coins.push(rand()>0.5?1:0);
+  sum=coins.reduce(function(a,b){return a+b;});yao.push(sum===3?0:sum===2?1:sum===1?1:0);
+  coins=[];for(var i=0;i<3;i++)coins.push(rand()>0.5?1:0);
+  sum=coins.reduce(function(a,b){return a+b;});yao.push(sum===3?0:sum===2?1:sum===1?1:0);
+  coins=[];for(var i=0;i<3;i++)coins.push(rand()>0.5?1:0);
+  sum=coins.reduce(function(a,b){return a+b;});yao.push(sum===3?0:sum===2?1:sum===1?1:0);
+  coins=[];for(var i=0;i<3;i++)coins.push(rand()>0.5?1:0);
+  sum=coins.reduce(function(a,b){return a+b;});yao.push(sum===3?0:sum===2?1:sum===1?1:0);
+  coins=[];for(var i=0;i<3;i++)coins.push(rand()>0.5?1:0);
+  sum=coins.reduce(function(a,b){return a+b;});yao.push(sum===3?0:sum===2?1:sum===1?1:0);
+  var guaNum=yao[0]*32+yao[1]*16+yao[2]*8+yao[3]*4+yao[4]*2+yao[5];
+  var guaData={1:{name:'乾为天',ci:'元亨利贞。',img:'天行健，君子以自强不息。',type:'福地',strat:'守',ov:'大展宏图之时，稳中求进，勿冒进。'},2:{name:'坤为地',ci:'元亨，利牝马之贞。',img:'地势坤，君子以厚德载物。',type:'福地',strat:'守',ov:'承载之力显现，柔中带刚，以德服人。'},3:{name:'水雷屯',ci:'元亨利贞，勿用有攸往。',img:'云雷屯，君子以经纶。',type:'困境',strat:'变',ov:'万事开头难，蓄势待发，不宜冒进。'},4:{name:'山水蒙',ci:'匪我求童蒙，童蒙求我。',img:'山下出泉，蒙。',type:'困境',strat:'观',ov:'启蒙之时，虚心受教，主动求学。'},5:{name:'水天需',ci:'需于郊，利用恒，无咎。',img:'云上于天，需。',type:'吸引子',strat:'观',ov:'等待时机，耐心蓄力，时机成熟再动。'},6:{name:'天水讼',ci:'有孚，窒惕，中吉，终凶。',img:'天与水违行，讼。',type:'陷阱',strat:'慎',ov:'争执是非，防诉讼，口舌是非，宜谦让。'},7:{name:'地水师',ci:'贞，丈人吉，无咎。',img:'地中有水，师。',type:'福地',strat:'守',ov:'领导统兵，众人归心，守正持重。'},8:{name:'水地比',ci:'吉。原筮，元永贞，不宁方来。',img:'地上有水，比。',type:'福地',strat:'留',ov:'亲比和睦，众人相助，水归大海。'},9:{name:'风天小畜',ci:'亨。密云不雨，自我西郊。',img:'风行天上，小畜。',type:'一般',strat:'观',ov:'蓄而未发，积小成大，时机未到。'},10:{name:'天泽履',ci:'履虎尾，不咥人，亨。',img:'上天下泽，履。',type:'排斥子',strat:'变',ov:'如履薄冰，谨慎行事，防小人有凶。'},11:{name:'地天泰',ci:'小往大来，吉，亨。',img:'天地交，泰。',type:'福地',strat:'守',ov:'天地交泰，万事亨通，阴阳调和。'},12:{name:'天地否',ci:'否之匪人，不利君子贞。',img:'天地不交，否。',type:'困境',strat:'变',ov:'闭塞不通，人际受阻，宜静待转机。'},13:{name:'天火同人',ci:'同人于野，亨。',img:'天与火，同人。',type:'吸引子',strat:'留',ov:'同人同心，人和万事成，广交天下友。'},14:{name:'火天大有',ci:'大有，元亨。',img:'火在天上，大有。',type:'福地',strat:'守',ov:'大有收获，柔得尊位，德威并济。'},15:{name:'地山谦',ci:'亨，君子有终。',img:'地中有山，谦。',type:'福地',strat:'守',ov:'谦受益，满招损，君子以谦德服人。'},16:{name:'雷地豫',ci:'利建侯行师。',img:'雷出地奋，豫。',type:'吸引子',strat:'留',ov:'心生喜悦，众乐乐，大有作为之时。'},17:{name:'泽雷随',ci:'元亨利贞，无咎。',img:'泽中有雷，随。',type:'吸引子',strat:'变',ov:'随缘从势，随机应变，顺势而为。'},18:{name:'山风蛊',ci:'元亨利贞，利涉大川。',img:'山下有风，蛊。',type:'困境',strat:'变',ov:'积弊已久，拨乱反正，改革除弊。'},19:{name:'地泽临',ci:'元亨利贞，至于八月有凶。',img:'泽上有地，临。',type:'吸引子',strat:'留',ov:'临事而惧，督导有方，亲临指导。'},20:{name:'风地观',ci:'盥而不荐，有孚颙若。',img:'风行地上，观。',type:'一般',strat:'观',ov:'观察形势，审视自我，先观后动。'},21:{name:'火雷噬嗑',ci:'亨，利用狱。',img:'雷电，噬嗑。',type:'一般',strat:'变',ov:'清除障碍，法治严明，明辨是非。'},22:{name:'山火贲',ci:'亨，小利有攸往。',img:'山下有火，贲。',type:'一般',strat:'观',ov:'文饰外表，修身养性，外饰内修。'},23:{name:'山地剥',ci:'不利有攸往。',img:'山附于地，剥。',type:'陷阱',strat:'慎',ov:'小人当道，保存实力，不宜妄动。'},24:{name:'地雷复',ci:'亨，出入无疾，朋来无咎。',img:'雷在地中，复。',type:'吸引子',strat:'留',ov:'去而复返，一阳来复，转运之时。'},25:{name:'山天大畜',ci:'利贞，不家食吉，利涉大川。',img:'天在山中，大畜。',type:'福地',strat:'守',ov:'蓄德养精，大有积蓄，宜进德修业。'},26:{name:'山雷颐',ci:'吉，利涉大川。',img:'山下有雷，颐。',type:'福地',strat:'守',ov:'养精蓄锐，养身修德，宜静养。'},27:{name:'风雷益',ci:'利有攸往，利涉大川。',img:'风雷益，君子以见善则迁。',type:'福地',strat:'留',ov:'损上益下，春风得意，乘势而上。'},28:{name:'泽雷随',ci:'大过，栋桡，利有攸往，亨。',img:'泽灭木，大过。',type:'排斥子',strat:'变',ov:'大过之势，栋桡之象，危中有机。'},29:{name:'水洊坎',ci:'习坎，有孚，维心亨。',img:'水洊习坎，君子以常德行。',type:'困境',strat:'观',ov:'重重险难，心诚则通，戒急戒躁。'},30:{name:'离为火',ci:'亨，畜牝牛吉。',img:'明两作，离。',type:'福地',strat:'守',ov:'光明照耀，文明以丽，柔进上行。'},31:{name:'泽山咸',ci:'亨利贞，取女吉。',img:'山上有泽，咸。',type:'吸引子',strat:'留',ov:'两心相感应，心意相通，人际和谐。'},32:{name:'雷风恒',ci:'亨，无咎，利有攸往。',img:'雷风恒，君子以立不易方。',type:'福地',strat:'守',ov:'恒久之道，顺时守恒，持久有成。'},33:{name:'天山遁',ci:'亨，小利贞。',img:'天下有山，遁。',type:'排斥子',strat:'走',ov:'退隐之时，宜守不宜进，以退为进。'},34:{name:'雷天大壮',ci:'利贞。',img:'雷在天上，大壮。',type:'吸引子',strat:'留',ov:'大壮之卦，行动有力，宜进不宜退。'},35:{name:'火地晋',ci:'康侯用锡马蕃庶，昼日三接。',img:'明出地上，晋。',type:'福地',strat:'留',ov:'旭日东升，晋升之时，功名显达。'},36:{name:'地火明夷',ci:'利艰贞。',img:'明入地中，明夷。',type:'困境',strat:'慎',ov:'明入地中，晦而受伤，宜潜藏勿用。'},37:{name:'风火家人',ci:'利女贞。',img:'风自火出，家人。',type:'福地',strat:'守',ov:'家庭和睦，风自火出，女内男外。'},38:{name:'火泽睽',ci:'小事吉。',img:'上火下泽，睽。',type:'一般',strat:'观',ov:'同中有异，异中求同，宜和而不争。'},39:{name:'水山蹇',ci:'利西南，不利东北。',img:'山上有水，蹇。',type:'困境',strat:'观',ov:'前有险阻，见险而止，知难而退。'},40:{name:'雷水解',ci:'利西南，其来复吉。',img:'雷雨作，解。',type:'吸引子',strat:'留',ov:'解除困难，雷雨大作，化险为夷。'},41:{name:'山泽损',ci:'利有攸往，损而有孚。',img:'山下有泽，损。',type:'一般',strat:'变',ov:'损下益上，先损后益，减必有增。'},42:{name:'风雷益',ci:'利有攸往，利涉大川。',img:'风雷益，君子以迁善改过。',type:'福地',strat:'留',ov:'益上加益，乘势而上，大有作为。'},43:{name:'泽天夬',ci:'扬于王庭，孚号有厉。',img:'泽上于天，夬。',type:'排斥子',strat:'变',ov:'决而能和，刚决柔弱，防小人害。'},44:{name:'天风姤',ci:'女壮，勿用取女。',img:'天下有风，姤。',type:'陷阱',strat:'慎',ov:'阴长阳消，防异性小人，宜刚中应柔。'},45:{name:'泽地萃',ci:'亨，王假有庙。',img:'泽上于地，萃。',type:'吸引子',strat:'留',ov:'万物萃聚，人和事聚，众望所归。'},46:{name:'地风升',ci:'元亨，用见大人。',img:'地中生木，升。',type:'福地',strat:'留',ov:'积小成大，升腾之时，步步高升。'},47:{name:'泽水困',ci:'亨，贞大人吉。',img:'泽无水，困。',type:'困境',strat:'观',ov:'困而通，穷则变通，君子以致命遂志。'},48:{name:'水风井',ci:'改邑不改井，无丧无得。',img:'木上有水，井。',type:'一般',strat:'守',ov:'井养不穷，守成不变，君子以劳民相时而养。'},49:{name:'泽火革',ci:'巳日乃孚，元亨利贞，悔亡。',img:'泽中有火，革。',type:'排斥子',strat:'变',ov:'革故鼎新，顺天应人，变革之时。'},50:{name:'火风鼎',ci:'元吉，亨。',img:'木上有火，鼎。',type:'福地',strat:'守',ov:'定鼎之象，权位稳定，大业可定。'},51:{name:'震为雷',ci:'亨，震来虩虩，笑言哑哑。',img:'洊雷震，君子以恐惧修省。',type:'一般',strat:'守',ov:'震百里，惊而惧之，惧以修省。'},52:{name:'艮为山',ci:'艮其背，不获其身。',img:'兼山，艮。',type:'一般',strat:'守',ov:'抑止之道，不获其身，行止有度。'},53:{name:'风山渐',ci:'女归吉，利贞。',img:'山上有木，渐。',type:'福地',strat:'守',ov:'循序渐进，女归吉，渐进有序。'},54:{name:'雷泽归妹',ci:'征凶，无攸利。',img:'泽上有雷，归妹。',type:'陷阱',strat:'慎',ov:'归妹之卦，动而有所往，婚姻之象。'},55:{name:'雷火丰',ci:'亨，王假之，勿忧。',img:'雷电皆至，丰。',type:'吸引子',strat:'留',ov:'雷电皆至，盛大辉煌，丰大之运。'},56:{name:'火山旅',ci:'小亨，旅贞吉。',img:'山上有火，旅。',type:'一般',strat:'观',ov:'旅于外，宜小亨，柔中带刚，旅行吉。'},57:{name:'巽为风',ci:'小亨，利有攸往，利见大人。',img:'随风，巽。',type:'一般',strat:'观',ov:'顺而顺，风行水上，深入浅出。'},58:{name:'兑为泽',ci:'亨，利贞。',img:'丽泽，兑。',type:'吸引子',strat:'留',ov:'朋友讲习，说以先民，喜悦之道。'},59:{name:'风水涣',ci:'亨，王假之。',img:'风行水上，涣。',type:'一般',strat:'变',ov:'涣散聚合，患难之中有转机。'},60:{name:'水泽节',ci:'亨，苦节不可贞。',img:'泽上有水，节。',type:'一般',strat:'守',ov:'节以制度，不伤财害民，节俭持家。'},61:{name:'风泽中孚',ci:'豚鱼吉，利涉大川。',img:'泽上有风，中孚。',type:'福地',strat:'守',ov:'信及豚鱼，诚心中孚，有所成就。'},62:{name:'雷山小过',ci:'亨，利贞。可小事，不可大事。',img:'山上有雷，小过。',type:'一般',strat:'观',ov:'小有过差，宜行小事，不宜大事。'},63:{name:'水火既济',ci:'亨小，利贞。',img:'水在火上，既济。',type:'一般',strat:'守',ov:'既济则乱于未济，小心翼翼，守成防乱。'},64:{name:'火水未济',ci:'亨，小狐汔济，濡其尾。',img:'火在水上，未济。',type:'困境',strat:'变',ov:'未济之卦，阴阳不交，慎始慎终。'}};
+  var gd=guaData[guaNum+1]||guaData[1];
+  var yaoCi=['初九：潜龙勿用。','六二：见龙在田，利见大人。','九三：君子终日乾乾，夕惕若厉。','九四：或跃在渊，无咎。','九五：飞龙在天，利见大人。','上九：亢龙有悔。'];
+  var oracle={
+    '守':question+'之事，宜守不宜动，稳住现有局面，等待时机成熟再出手，方可无损。',
+    '变':question+'之事，当前形势已变，宜随势而动，果断出击，不可墨守成规。',
+    '留':question+'之事，留在原地为宜，守住现有资源，不可轻举妄动，留待更好的机会。',
+    '观':question+'之事，先静观其变，看清形势再作决定，不可仓促行动。',
+    '慎':question+'之事，需谨慎行事，三思而后行，防小人在侧，宜稳不宜急。',
+    '走':question+'之事，不利久留，考虑撤退或转移方向，避开不利因素。'
+  };
+  return{guaNum:guaNum+1,name:gd.name,guaCi:gd.ci,img:gd.img,yaoCi:yaoCi,oracle:oracle[gd.strat]||oracle['观'],type:gd.type,strategy:gd.strat,strategyNote:gd.ov};
+}
+
+// ══ LIU REN (小六壬) ══
+function getLiuRen(){
+  var now=new Date(),lm=now.getMonth()+1,ld=now.getDate(),lh=now.getHours();
+  var mIdx=lm;
+  var dIdx=((ld+2)%6)||6;
+  var positions=['大安','留连','赤口','小吉','空亡','速喜'];
+  var meanings={'大安':{mean:'身不动时，大安。万事求安，行事顺利，无风险。',advice:'诸事平稳，宜守成，不宜冒险激进。',good:'求财、谈判、签约、远行均吉。',bad:'大安本身平和，但过于安稳可能错失机会。'},'留连':{mean:'人未归时，留连。运势滞涩不进，暧昧不明。',advice:'时机未到，不宜强求，需耐心等待。感情有暗昧不明之事。',good:'感情暧昧期有利，宜观察。',bad:'财运受阻，不宜投资，防小人纠缠。'},'赤口':{mean:'官事凶，赤口。官非争执，口舌是非，意外伤灾。',advice:'防口舌官非，不宜与人口角，少说话多做事。',good:'对小人而言赤口有利，对好人则凶。',bad:'防意外金属伤害，防火光之灾。'},'小吉':{mean:'人来喜，小吉。人縁和合，所求顺遂，办事通达。',advice:'万事吉兆，人缘好，办事顺，宜社交、婚嫁、求职。',good:'利人际交往，利合作，利表白求婚。',bad:'小吉之后易有回落，宜趁势而上。'},'空亡':{mean:'虚无何也，空亡。谋事成空，劳而无功，一无所获。',advice:'不宜新开始的项目，不宜投资，不宜远行。',good:'空亡之后必有实，利反思总结。',bad:'防破财，防上当，防签空头合同。'},'速喜':{mean:'喜即至，速喜。喜事临门，消息速来，办事速成。',advice:'好消息即将来临，宜把握时机，主动出击。',good:'利远行来信，利搬迁，利考试，利表白成功。',bad:'速喜来得快也去得快，宜抓紧行动。'}};
+  var pos=positions[(mIdx+dIdx+lh)%6]||positions[0];
+  var m=meanings[pos];
+  return{position:pos,mean:m.mean,advice:m.advice,good:m.good,bad:m.bad};
+}
+
+// ══ MEIHUA YISHU (梅花易数 simplified) ══
+function getMeiHuaYiShu(question){
+  var now=new Date();
+  var seed=now.getHours()*3600+now.getMinutes()*60+now.getSeconds()+question.length;
+  var rand=function(){seed=(seed*9301+49297)%233280;return seed/233280;};
+  var n1=Math.floor(rand()*8)+1,n2=Math.floor(rand()*8)+1,n3=Math.floor(rand()*8)+1;
+  var shang=n1%4||4,xia=n2%4||4,dong=n3%4||4;
+  var shangGua=shang<=2?1:shang===3?0:1;
+  var xiaGua=xia<=2?1:xia===3?0:1;
+  var dongGua=dong===3?1:0;
+  var guaNum=shangGua*4+xiaGua*2+dongGua;
+  var types=['吸引子','吸引子','排斥子','排斥子','困境','困境','福地','一般'];
+  var strategies=['留','走','变','变','观','观','守','观'];
+  var type=types[guaNum]||'一般';
+  var strat=strategies[guaNum]||'观';
+  var body=shangGua===1?'乾':'坤';
+  var use=xiaGua===1?'乾':'坤';
+  var timing=shangGua===1&&dongGua===1?'春季':'夏季';
+  return{upper:n1,lower:n2,moving:dong,guaNum:guaNum,body:body,use:use,timing:timing,type:type,strategy:strat,meaning:'上卦'+n1+'数，下卦'+n2+'数，动爻'+dong+'。体卦'+body+'用卦'+use+'，'+timing+'当旺。'};
+}
+
+// ══ CROSS-SYSTEM SUMMARY ══
+function buildCrossSystemSummary(bazi,liuRen){
+  var parts=['【八字综合】'+bazi];
+  if(liuRen)parts.push('【小六壬·今日】'+liuRen.position+'——'+liuRen.advice);
+  return parts.join('\n');
+}
+
+// ══ PERSONALITY ══
 function buildPersonality(dayS,str,ssCount,el,geju){
   var tags=[],paras=[];
-  // 1. Strength
   if(str==='旺'){tags.push('主见强');paras.push('身旺之人，自信果断，行动力强，有主见不易受人左右。执行力突出，但有时过于强势。');}
   else{tags.push('善适应');paras.push('身弱之人，善于观察和适应环境，待人接物温和细致。做事深思熟虑，但有时优柔寡断。');}
-  // 2. Ten Gods
   var sorted=Object.entries(ssCount).sort(function(a,b){return b[1]-a[1]});
   var dominant=sorted.filter(function(x){return x[1]>=2});
   var top1=sorted.filter(function(x){return x[1]>=1});
@@ -490,45 +632,27 @@ function buildPersonality(dayS,str,ssCount,el,geju){
   var conflicts={'比肩:正财':'既想独立闯天下，又想稳定守成——宜在稳定框架内寻求独立空间。','比肩:正官':'既有竞争野心，又受规则约束——体制内创业更适合你。','正财:伤官':'务实求稳与创意叛逆拉扯——用创意赚钱同时守财务底线。','正官:伤官':'规则意识与反叛精神并存——需要打破规则的工作更适合。','正印:七杀':'学习型遇上实战型挑战——主动争取实战机会建立自信。'};
   if(dominant.length>0){
     dominant.forEach(function(d){var t=ssT[d[0]];tags.push(t.t);paras.push(d[0]+'旺（'+d[1]+'个）——'+t.p+'。但也需注意：'+t.n+'。事业利于'+t.c+'。');});
-    // conflict detection
-    for(var i=0;i<dominant.length;i++){for(var j=i+1;j<dominant.length;j++){var k1=dominant[i][0]+':'+dominant[j][0],k2=dominant[j][0]+':'+dominant[i][0];var cf=conflicts[k1]||conflicts[k2];if(cf){paras.push('⚡ 特质解析：'+cf);i=99;break;}}}
+    for(var i=0;i<dominant.length;i++){for(var j=i+1;j<dominant.length;j++){var k1=dominant[i][0]+':'+dominant[j][0],k2=dominant[j][0]+':'+dominant[i][0];var cf=conflicts[k1]||conflicts[k2];if(cf){paras.push('特质解析：'+cf);i=99;break;}}}
   } else if(top1.length>=1){
     var t=ssT[top1[0][0]];tags.push(t.t);paras.push(top1[0][0]+'（'+top1[0][1]+'个）——'+t.p+'。');
   }
-  // 3. Elements
   var elP={木:{ex:'仁心过重，容易心软被利用',lk:'缺少同理心与变通'},火:{ex:'急躁冲动，容易情绪化',lk:'缺少热情与行动力'},土:{ex:'过于固执保守',lk:'缺少稳定感'},金:{ex:'过于刚硬计较',lk:'缺少决断力'},水:{ex:'想法太多行动太少',lk:'缺少灵活机巧'}};
   EN.forEach(function(e){if(el[e]>=4){tags.push(e+'旺');paras.push('五行'+e+'偏旺——'+elP[e].ex+'。');}if(el[e]===0){tags.push('缺'+e);paras.push('五行缺'+e+'——'+elP[e].lk+'。建议后天弥补。');}});
-  // 4. Pattern
   var gjT={正官格:{t:'正道',d:'适合体制内或大企业'},七杀格:{t:'开拓',d:'适合竞争激烈的环境'},正印格:{t:'学术',d:'悟性极高，学业运佳'},偏印格:{t:'偏才',d:'善走偏门'},正财格:{t:'积累',d:'稳健积累型'},偏财格:{t:'机遇',d:'善抓机会'},食神格:{t:'享福',d:'品味高，人缘好'},伤官格:{t:'才子',d:'才华横溢'},建禄格:{t:'自立',d:'白手起家型'},羊刃格:{t:'刚烈',d:'性格刚猛有魄力'}};
   if(gjT[geju]){tags.push(gjT[geju].t);paras.push('格局为'+geju+'——'+gjT[geju].d+'。');}
-  return{tags:tags,text:paras.join('\n')};
+  return{tags:tags,text: paras.join('\n')};
 }
 
-function getReadings(dayS,str,el,geju,monthSS){
-  var dEl=GE[TG.indexOf(dayS)];
-  var career={正官:'事业稳健，适合体制内或管理岗位，贵人助力明显。',七杀:'事业有魄力与冲劲，适合创业或开拓性工作。',正印:'学业有成，适合文教领域，思维清晰。',偏印:'具有特殊才能，适合技术或研究。',正财:'收入稳定，适合固定工作或理财投资。',偏财:'财运波动较大，适合投资或副业。',食神:'才华横溢，适合艺术创作或餐饮。',伤官:'创意丰富，适合自由职业。',比肩:'独立自主，适合合伙创业。',劫财:'财运起伏，需谨慎理财。'};
-  var marriage=str==='旺'?'日主旺盛，感情中较为主动强势。异性缘不错，但需学会包容与妥协。':'日主偏弱，感情中较为被动温和。重感情，宜找强势互补的另一半。';
-  var wealth=el['金']>=3?'财星旺盛，一生财运亨通。':el['金']<=1?'财星偏弱，财运需靠自身努力。':'财运中等，勤俭持家可致富。';
-  var health={木:'需注意肝胆、筋骨保养。',火:'需注意心脏、血液循环。',土:'需注意脾胃消化系统。',金:'需注意肺部、呼吸系统。',水:'需注意肾脏、泌尿系统。'};
-  return[{icon:'💼',title:'事业运势',text:career[monthSS]||'事业平稳，宜脚踏实地。'},{icon:'💕',title:'婚姻感情',text:marriage},{icon:'💰',title:'财运分析',text:wealth},{icon:'🏥',title:'健康提示',text:health[dEl]}];
-}
-
-function getElVar(e){return{木:'mu',火:'huo',土:'tu',金:'jin',水:'shui'}[e]||'mo';}
-
-// ══ TOOLTIP SYSTEM ══
-var lastPillars=null,lastDayS=null;
-
+// ══ TOOLTIP ══
 var GAN_EX={甲:'甲木·阳·参天大树·肝胆',乙:'乙木·阴·花草藤蔓·颈肝',丙:'丙火·阳·太阳烈火·额小肠',丁:'丁火·阴·灯烛星光·心脏',戊:'戊土·阳·高山大地·鼻胃',己:'己土·阴·田园沃土·脾面',庚:'庚金·阳·刀剑钢铁·筋骨大肠',辛:'辛金·阴·珠宝玉器·肺胸',壬:'壬水·阳·江河大海·胫膀胱',癸:'癸水·阴·雨露清泉·肾足'};
 var ZHI_EX={子:'子·水·23-01时·正北',丑:'丑·土·01-03时·东北',寅:'寅·木·03-05时·东北',卯:'卯·木·05-07时·正东',辰:'辰·土·07-09时·东南',巳:'巳·火·09-11时·东南',午:'午·火·11-13时·正南',未:'未·土·13-15时·西南',申:'申·金·15-17时·西南',酉:'酉·金·17-19时·正西',戌:'戌·土·19-21时·西北',亥:'亥·水·21-23时·西北'};
 var PEX={年柱:'代表祖上父母宫，影响1-16岁运势。看家世背景、早年环境。',月柱:'代表父母兄弟宫，影响16-32岁。月支是命局提纲，决定格局。',日柱:'代表自己和配偶宫，影响32-48岁。日干是日主代表自己。',时柱:'代表子女宫，影响48岁后运势。看子女状况、晚年生活。'};
-
+var lastPillars=null,lastDayS=null;
 function showTT(idx){
   if(!lastPillars)return;
   var p=lastPillars[idx],labels=['年柱','月柱','日柱','时柱'];
-  var ss=idx===2?'日主':getShiShen(lastDayS,p.s);
-  var cg=ZCG[p.b]||[];
-  var h='<div class="tt-pillar-name">'+labels[idx]+'</div>';
-  h+='<div class="tt-gz">'+p.s+p.b+'</div>';
+  var ss=idx===2?'日主':getShiShen(lastDayS,p.s),cg=ZCG[p.b]||[];
+  var h='<div class="tt-pillar-name">'+labels[idx]+'</div><div class="tt-gz">'+p.s+p.b+'</div>';
   h+='<div class="tt-row"><span class="tt-label">天干</span><span class="tt-value">'+GAN_EX[p.s]+'</span></div>';
   h+='<div class="tt-row"><span class="tt-label">地支</span><span class="tt-value">'+ZHI_EX[p.b]+'</span></div>';
   h+='<div class="tt-row"><span class="tt-label">五行</span><span class="tt-value"><span class="tag el-'+GE[p.gi]+'">'+GE[p.gi]+'</span> <span class="tag el-'+ZE[p.zi]+'">'+ZE[p.zi]+'</span></span></div>';
@@ -544,6 +668,34 @@ function closeTT(){document.getElementById('ttOverlay').classList.remove('active
 var lpTimer=null;
 function onPillarDown(e,idx){lpTimer=setTimeout(function(){showTT(idx)},400);}
 function onPillarUp(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}}
+function getElVar(e){return{木:'mu',火:'huo',土:'tu',金:'jin',水:'shui'}[e]||'mo';}
+
+// ══ YIJING BUTTON HANDLER ══
+function doYiJing(){
+  var q=document.getElementById('yijing-question').value.trim();
+  if(!q){alert('请输入您想问的问题');return;}
+  document.getElementById('yijing-result').innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:2rem">🧘</div><div style="margin-top:8px;color:var(--songyan)">心诚则灵，起卦中...</div></div>';
+  setTimeout(function(){
+    var r=getYiJingHexagram(q);
+    var stratColor={守:'var(--mu)',变:'var(--huo)',留:'var(--tu)',观:'var(--jin)',慎:'var(--zhusha)',走:'var(--shui)'}[r.strategy]||'var(--songyan)';
+    var html='<div style="text-align:center;margin-bottom:20px"><div style="font-family:LXGW WenKai,serif;font-size:2.2rem;font-weight:700;margin-bottom:4px">'+r.name+'</div><div style="font-size:.8rem;color:var(--songyan);letter-spacing:2px">第'+r.guaNum+'卦</div></div>';
+    html+='<div style="background:rgba(42,36,32,.04);padding:16px;border-radius:10px;margin-bottom:14px"><div style="font-family:LXGW WenKai,serif;font-size:.95rem;line-height:1.8">'+r.guaCi+'</div><div style="font-size:.85rem;color:var(--songyan);margin-top:8px">象曰：'+r.img+'</div></div>';
+    html+='<div style="background:var(--card);padding:14px;border-radius:10px;margin-bottom:14px;text-align:left"><div style="font-size:.75rem;color:var(--songyan);margin-bottom:8px;letter-spacing:2px">六爻：</div>';
+    r.yaoCi.forEach(function(y){html+='<div style="font-size:.82rem;margin-bottom:4px;color:var(--songyan)">'+y+'</div>';});
+    html+='</div>';
+    html+='<div style="display:inline-block;padding:8px 20px;border-radius:8px;background:'+stratColor+';color:#fff;font-size:.82rem;margin-bottom:12px">策略：'+r.strategy+'</div>';
+    html+='<div style="background:rgba(42,36,32,.03);padding:14px;border-radius:10px;text-align:left;font-size:.88rem;line-height:1.75">'+r.oracle+'</div>';
+    document.getElementById('yijing-result').innerHTML=html;
+  },800);
+}
+
+function doLiuRen(){
+  var r=getLiuRen();
+  var stratColor={大安:'var(--mu)',留连:'var(--songyan)',赤口:'var(--zhusha)',小吉:'var(--jin)',空亡:'var(--tu)',速喜:'var(--huo)'}[r.position]||'var(--songyan)';
+  document.getElementById('liuren-result').innerHTML='<div style="text-align:center;margin-bottom:14px"><div style="font-family:LXGW WenKai,serif;font-size:1.8rem;font-weight:700;color:'+stratColor+'">'+r.position+'</div><div style="font-size:.78rem;color:var(--songyan);margin-top:4px">小六壬 · 今日速断</div></div><div style="background:var(--card);padding:14px;border-radius:10px;text-align:left;font-size:.85rem;line-height:1.75">'+r.mean+'</div><div style="margin-top:12px"><div style="font-size:.72rem;color:var(--mu);letter-spacing:2px;margin-bottom:6px">✓ 宜</div><div style="font-size:.82rem;margin-bottom:10px">'+r.good+'</div><div style="font-size:.72rem;color:var(--zhusha);letter-spacing:2px;margin-bottom:6px">⚠ 忌</div><div style="font-size:.82rem">'+r.bad+'</div></div>';
+}
+
+function toggleDiv(id){var el=document.getElementById(id);if(!el)return;var cur=el.style.display;el.style.display=cur==='none'?'block':'none';}
 
 // ══ MAIN CALCULATION ══
 function go(){
@@ -556,74 +708,51 @@ function go(){
       var pils=[yp,mp,dp,hp],labels=['年柱','月柱','日柱','时柱'];
       var el=countEl(pils),str=dmStrength(dp.gi,el),dayS=dp.s,dEl=GE[dp.gi];
       lastPillars=pils;lastDayS=dayS;
-
       document.getElementById('rn').textContent=name?name+' 的命盘全解':'命盘全解';
       document.getElementById('rm').textContent='公历 '+y+'年'+m+'月'+d+'日 '+DZ[hi]+'时 | '+gender+' | '+GY[dp.gi]+dEl+'命';
-
-      // 1. Pillars
-      document.getElementById('pil').innerHTML=pils.map(function(p,i){
-        var se=GE[p.gi],be=ZE[p.zi],ss=i===2?'日主':getShiShen(dayS,p.s),cg=ZCG[p.b]||[];
-        return '<div class="pillar" ontouchstart="onPillarDown(event,'+i+')" ontouchend="onPillarUp()" ontouchcancel="onPillarUp()" oncontextmenu="event.preventDefault();showTT('+i+')">'
-          +'<div class="info-btn" onclick="event.stopPropagation();showTT('+i+')">?</div>'
-          +'<div class="p-label">'+labels[i]+'</div>'
-          +'<div class="p-stem" style="color:var(--'+getElVar(se)+')">'+p.s+'</div>'
-          +'<div class="p-branch" style="color:var(--'+getElVar(be)+')">'+p.b+'</div>'
-          +'<div class="p-shishen">'+ss+'</div>'
-          +'<span class="tag el-'+se+'">'+se+'</span>'
-          +'<div class="p-canggan">藏 '+cg.join(' ')+'</div></div>';
-      }).join('');
-
-      // 2. Elements
+      document.getElementById('pil').innerHTML=pils.map(function(p,i){var se=GE[p.gi],be=ZE[p.zi],ss=i===2?'日主':getShiShen(dayS,p.s),cg=ZCG[p.b]||[];return'<div class="pillar" ontouchstart="onPillarDown(event,'+i+')" ontouchend="onPillarUp()" ontouchcancel="onPillarUp()" oncontextmenu="event.preventDefault();showTT('+i+')"><div class="info-btn" onclick="event.stopPropagation();showTT('+i+')">?</div><div class="p-label">'+labels[i]+'</div><div class="p-stem" style="color:var(--'+getElVar(se)+')">'+p.s+'</div><div class="p-branch" style="color:var(--'+getElVar(be)+')">'+p.b+'</div><div class="p-shishen">'+ss+'</div><span class="tag el-'+se+'">'+se+'</span><div class="p-canggan">藏 '+(cg.length?cg.join(' '):'')+'</div></div>';}).join('');
       var mx=Math.max.apply(null,EN.map(function(n){return el[n]}))||1;
-      document.getElementById('elb').innerHTML=EN.map(function(n){
-        return '<div class="el-item"><div class="el-track"><div class="el-fill" style="height:'+(el[n]/mx*100)+'%;background:var(--'+getElVar(n)+')"></div></div><div class="el-name">'+n+'</div><div class="el-cnt">'+el[n]+'</div></div>';
-      }).join('');
-
-      // Calculate dependencies
+      document.getElementById('elb').innerHTML=EN.map(function(n){return'<div class="el-item"><div class="el-track"><div class="el-fill" style="height:'+(el[n]/mx*100)+'%;background:var(--'+getElVar(n)+')"></div></div><div class="el-name">'+n+'</div><div class="el-cnt">'+el[n]+'</div></div>';}).join('');
       var ssCount=countShiShen(dayS,pils),monthSS=getShiShen(dayS,mp.s),geju=getGeJu(monthSS),ys=getYongShen(dEl,str);
       var pers=buildPersonality(dayS,str,ssCount,el,geju);
-
-      // 3. Day Master
       document.getElementById('dmc').textContent=dayS;
       document.getElementById('dmc').style.color='var(--'+getElVar(dEl)+')';
       var virtueMap={木:'仁',火:'礼',土:'信',金:'义',水:'智'};
-      var tagHtml=pers.tags.slice(0,4).map(function(t){return '<span class="tag" style="background:var(--songyan)">'+t+'</span>';}).join('');
+      var tagHtml=pers.tags.slice(0,4).map(function(t){return'<span class="tag" style="background:var(--songyan)">'+t+'</span>';}).join('');
       var missingHtml='';EN.forEach(function(k){if(el[k]===0)missingHtml+=' <b style="color:var(--zhusha)">缺'+k+'</b>';});
       document.getElementById('dmi').innerHTML=GY[dp.gi]+dEl+' · 日主偏'+str+' · '+virtueMap[dEl]+'德之命<br>'+tagHtml+'<br><span style="font-size:.78rem">五行：木'+el['木']+' 火'+el['火']+' 土'+el['土']+' 金'+el['金']+' 水'+el['水']+missingHtml+'</span>';
-
-      // 4. Personality
-      document.getElementById('ptx').innerHTML=pers.text.split('\n').filter(function(p){return p.trim()}).map(function(p){return '<div class="ln-item">'+p+'</div>';}).join('');
-
-      // 5. Ten Gods
+      document.getElementById('ptx').innerHTML=pers.text.split('\n').filter(function(p){return p.trim()}).map(function(p){return'<div class="ln-item">'+p+'</div>';}).join('');
       var ssDescs={比肩:'同我助力',劫财:'争财竞争',食神:'才华福气',伤官:'创意叛逆',偏财:'意外之财',正财:'稳定收入',七杀:'权威压力',正官:'贵人名声',偏印:'偏才技艺',正印:'学识庇护'};
-      document.getElementById('ssg').innerHTML=Object.entries(ssCount).map(function(x){return '<div class="ss-item"><div class="ss-name">'+x[0]+'</div><div class="ss-count">'+x[1]+'</div><div class="ss-desc">'+ssDescs[x[0]]+'</div></div>';}).join('');
-
-      // 6. GeJu & YongShen
+      document.getElementById('ssg').innerHTML=Object.entries(ssCount).map(function(x){return'<div class="ss-item"><div class="ss-name">'+x[0]+'</div><div class="ss-count">'+x[1]+'</div><div class="ss-desc">'+ssDescs[x[0]]+'</div></div>';}).join('');
       document.getElementById('gjn').textContent=geju;
       var gjDescs={正官格:'官星当令，宜公职仕途',七杀格:'杀星得力，宜武职创业',正印格:'印星高照，宜学术文教',偏印格:'偏印独秀，宜技术研究',正财格:'财星当令，宜商贾理财',偏财格:'偏财旺盛，宜投资副业',食神格:'食神吐秀，宜艺术餐饮',伤官格:'伤官泄秀，宜自由创作',建禄格:'建禄当令，宜独立自主',羊刃格:'羊刃逢冲，宜武职竞技'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
       document.getElementById('ysg').innerHTML='<div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+ys.xi.join(' · ')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+ys.ji.join(' · ')+'</div></div>';
-
-      // 7. DaYun
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
-      document.getElementById('dyt').innerHTML=dayun.map(function(d){return '<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
-
-      // 8. LiuNian
+      document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
       var curYear=new Date().getFullYear(),ln=getLiuNian(curYear,dayS);
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
       document.getElementById('lns').textContent='流年十神：'+ln.ss;
       var lnDescs={比肩:'今年自我意识增强，适合独立发展。',劫财:'今年花销较大，注意理财。',食神:'今年创造力旺盛，生活愉悦。',伤官:'今年思维活跃但口舌多，宜低调。',偏财:'今年偏财运佳，可适度投资。',正财:'今年正财稳定，适合置业。',七杀:'今年压力较大，有贵人暗中相助。',正官:'今年贵人运强，利晋升。',偏印:'今年学习运佳，适合进修。',正印:'今年思路清晰，学业工作顺利。'};
       document.getElementById('lnd').innerHTML='<div class="ln-item">'+(lnDescs[ln.ss]||'流年平稳。')+'</div><div class="ln-item">流年五行属'+GE[ln.gi]+'，与日主关系'+ln.ss+'。</div><div class="ln-item">建议：多亲近'+ys.xi.join('、')+'，远离'+ys.ji.join('、')+'。</div>';
-
-      // 9. Shen Sha
-      var sha=getShenSha(dayS,pils);
-      document.getElementById('shg').innerHTML=sha.map(function(s){return '<div class="sha-item '+(s.type==='吉'?'ji':'xiong')+'"><div class="sha-name">'+s.name+'</div><span class="sha-type '+(s.type==='吉'?'ji-t':'xiong-t')+'">'+s.type+'</span><div class="sha-meaning">'+s.desc+'</div></div>';}).join('');
-
-      // 10. Readings
-      var readings=getReadings(dayS,str,el,geju,monthSS);
-      document.getElementById('rdg').innerHTML=readings.map(function(r){return '<div class="reading-card"><div class="reading-icon">'+r.icon+'</div><div class="reading-title">'+r.title+'</div><div class="reading-text">'+r.text+'</div></div>';}).join('');
-
+      var sha=getAllShenSha(dayS,pils);
+      document.getElementById('shg').innerHTML=sha.map(function(s){return'<div class="sha-item '+(s.type==='吉'?'ji':'xiong')+'"><div class="sha-name">'+s.name+'</div><span class="sha-type '+(s.type==='吉'?'ji-t':'xiong-t')+'">'+s.type+'</span><div class="sha-meaning">'+s.desc+'</div></div>';}).join('');
+      var mrr=buildMarriageReading(dayS,monthSS,pils,el,str,ssCount);
+      document.getElementById('mrr-spouse').textContent=mrr.spouseStem;
+      document.getElementById('mrr-age').textContent=mrr.marriageAge;
+      document.getElementById('mrr-notes').innerHTML=mrr.notes.map(function(n){return'<div class="ln-item">'+n+'</div>';}).join('');
+      var crr=buildCareerReading(dayS,monthSS,el,str,ssCount);
+      document.getElementById('cr-apt').textContent=crr.apt.join('、');
+      document.getElementById('cr-apt-bar').style.width=crr.aptIndex+'%';
+      document.getElementById('cr-wlt-bar').style.width=crr.wealthIndex+'%';
+      document.getElementById('cr-notes').innerHTML=crr.notes.map(function(n){return'<div class="ln-item">'+n+'</div>';}).join('');
+      var hlr=buildHealthReading(dayS,el,str);
+      document.getElementById('hl-organs').innerHTML=hlr.weak.map(function(o){return'<span class="tag" style="background:var(--songyan)">'+o+'</span>';}).join(' ');
+      document.getElementById('hl-bar').style.width=hlr.healthIndex+'%';
+      document.getElementById('hl-bar').textContent=hlr.healthIndex+'%';
+      document.getElementById('hl-notes').innerHTML=hlr.notes.map(function(n){return'<div class="ln-item">'+n+'</div>';}).join('');
+      doLiuRen();
       showPage('results-page');
     }catch(err){console.error('排盘出错:',err);alert('计算出错: '+err.message);}
   },2200);
@@ -633,5 +762,6 @@ function shareR(){if(navigator.share)navigator.share({title:'命理通·八字�
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 
 </script>
+
 </body>
 </html>
