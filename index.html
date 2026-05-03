@@ -547,7 +547,7 @@ function getAllShenSha(dayS,pils){
 }
 
 // ══ MARRIAGE READING ══
-function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount){
+function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount,ln){
   var dEl=GE[TG.indexOf(dayS)],dy=GY[TG.indexOf(dayS)];
   var spouseStem=monthSS==='正官'?'正官（女命正缘）':monthSS==='七杀'?'七杀（感情波动）':monthSS==='正印'?'正印（年龄偏大）':monthSS==='偏财'?'偏财（财旺嫁富）':'其他';
   var notes=[];
@@ -889,7 +889,7 @@ function go(){
       document.getElementById('lnd').innerHTML='<div class="ln-item">'+(lnDescs[ln.ss]||'流年平稳。')+'</div><div class="ln-item">流年五行属'+GE[ln.gi]+'，与日主关系'+ln.ss+'。</div><div class="ln-item">建议：多亲近'+ys.xi.join('、')+'，远离'+ys.ji.join('、')+'。</div>';
       var sha=getAllShenSha(dayS,pils);
       document.getElementById('shg').innerHTML=sha.map(function(s){return'<div class="sha-item '+(s.type==='吉'?'ji':'xiong')+'"><div class="sha-name">'+s.name+'</div><span class="sha-type '+(s.type==='吉'?'ji-t':'xiong-t')+'">'+s.type+'</span><div class="sha-meaning">'+s.desc+'</div></div>';}).join('');
-      var mrr=buildMarriageReading(dayS,monthSS,pils,el,str,ssCount);
+      var mrr=buildMarriageReading(dayS,monthSS,pils,el,str,ssCount,ln);
       document.getElementById('mrr-spouse').textContent=mrr.spouseStem;
       document.getElementById('mrr-age').textContent=mrr.marriageAge;
       document.getElementById('mrr-notes').innerHTML=mrr.notes.map(function(n){return'<div class="ln-item">'+n+'</div>';}).join('');
@@ -912,6 +912,7 @@ function go(){
 function shareR(){if(navigator.share)navigator.share({title:'命理通·八字命盘',text:'来看看你的命运！',url:location.href});else alert('已复制链接！')}
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 </script>
+
 
 
 
