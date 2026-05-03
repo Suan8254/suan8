@@ -887,7 +887,6 @@ function go(){
       document.getElementById('lns').textContent='流年十神：'+ln.ss;
       var lnDescs={比肩:'今年自我意识抬头，适合独立推进一些事情。不必太在意别人怎么看你，按自己的节奏走就好。但注意：独行不等于孤立，适当借力会让路走得更顺。',劫财:'今年花钱的地方会比较多——可能是投资、健康、或是意料之外的开支。提前做好财务规划，留一部分备用金，别让钱的问题影响心情。',食神:'今年整体状态会比较愉快，创造力和感受力都在线。适合学点新东西，发展兴趣爱好，也适合在生活上给自己一点小确幸。',伤官:'今年脑子特别活，点子多，但也容易说太多或想太多。口舌是非是这一年的高发区——说话前多停三秒，能避开不少麻烦。',偏财:'今年偏财运不错，可能是副业、投资或意外收入。但记住：机会好的时候也是最容易冲动的时候，设好止损线再出手。',正财:'今年正财稳定，适合做置业、储蓄、长期理财等规划。工作上如果有机会谈薪资或合作条件，今年是开口的好时机。',七杀:'今年压力不小，可能是工作、竞争或来自权威的施压。但别慌——七杀压顶往往是突破前的信号。你的魄力今年是你最大的武器。',正官:'今年贵人运强，做事容易得到认可和帮助。如果有晋升、合作、考编的机会今年值得积极争取。遇到难处时记得主动开口，别人愿意拉你一把。',偏印:'今年学习运不错，适合进修、学新技能、或者考个证书。也适合做一些需要深度思考的复盘工作，为下一步打好基础。',正印:'今年思路清晰，学业和工作都比较顺。适合把之前积累的东西整理输出——写文章、做分享、梳理经验。今年你说出的话比平时更有分量。'};
       document.getElementById('lnd').innerHTML='<div class="ln-item">'+(lnDescs[ln.ss]||'流年平稳。')+'</div><div class="ln-item">流年五行属'+GE[ln.gi]+'，与日主关系'+ln.ss+'。</div><div class="ln-item">建议：多亲近'+ys.xi.join('、')+'，远离'+ys.ji.join('、')+'。</div>';
-      html+="<div class='yj-hugua' style='margin-top:12px;padding:12px;background:rgba(90,90,140,.06);border-radius:8px;font-size:.82rem;line-height:1.7'><b style='color:var(--jin)'>🔄 互卦分析：</b>"+r.huguagIntro+"</div>";
       var sha=getAllShenSha(dayS,pils);
       document.getElementById('shg').innerHTML=sha.map(function(s){return'<div class="sha-item '+(s.type==='吉'?'ji':'xiong')+'"><div class="sha-name">'+s.name+'</div><span class="sha-type '+(s.type==='吉'?'ji-t':'xiong-t')+'">'+s.type+'</span><div class="sha-meaning">'+s.desc+'</div></div>';}).join('');
       var mrr=buildMarriageReading(dayS,monthSS,pils,el,str,ssCount);
@@ -913,6 +912,7 @@ function go(){
 function shareR(){if(navigator.share)navigator.share({title:'命理通·八字命盘',text:'来看看你的命运！',url:location.href});else alert('已复制链接！')}
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 </script>
+
 
 
 
