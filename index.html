@@ -573,6 +573,13 @@ function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount){
     sha.push({name:'天喜',type:'吉',desc:'与红鸾相配，主吉庆、嫁娶、添丁之喜'});
     sha.push({name:'陀罗',type:'凶',desc:'主波折、阻碍、意外困扰，随运而行，不离不散'});
     sha.push({name:'铃星',type:'凶',desc:'主突发性冲突、意外伤害，暗藏风险，宜守不宜攻'});
+    
+    sha.push({name:'地空',type:'凶',desc:'主落空、破财、创意受阻，从事创意行业者需特别注意'});
+    sha.push({name:'地劫',type:'凶',desc:'主突发性破耗、财务波折，常伴随意外支出'});
+    sha.push({name:'天哭',type:'凶',desc:'主悲伤、忧虑、情绪低落，宜注意心理健康'});
+    sha.push({name:'天虚',type:'凶',desc:'主空虚无实感，容易自我怀疑，需防止精神内耗'});
+    sha.push({name:'寡宿',type:'凶',desc:'主孤独、寡居倾向，感情上容易落单或被疏远'});
+    sha.push({name:'孤辰',type:'凶',desc:'主独立、不合群，社交关系浅而难深入'});
     // ══ CAREER / WEALTH READING ══
 function buildCareerReading(dayS,monthSS,el,str,ssCount){
   var apt=[],wealth=[],notes=[];
@@ -610,6 +617,9 @@ function buildHealthReading(dayS,el,str){
     if(ln.ss==='正财')notes.push('红鸾在命，天喜随行——今年有嫁娶或添丁吉兆，已婚者宜把握。');
     if(ln.ss==='七杀')notes.push('陀罗、铃星入命，防意外冲突，决策前多停三天。');
     if(ln.ss==='偏印')notes.push('陀罗在流年，宜保守推进，重大决策延后三个月。');
+      if(ln.ss==='劫财')notes.push('天哭、天虚入流年，注意情绪波动，破耗较多，宜守不宜攻。');
+      if(ln.ss==='伤官')notes.push('伤官配天虚，容易陷入自我否定，少想多做是今年最重要的课题。');
+      if(ln.ss==='偏印')notes.push('寡宿、孤辰在命，注意社交孤独感，主动参与社群活动能化解。');
       if(notes.length===0||notes.length===1)notes=['五行较平衡，没有明显的先天短板。但这不意味着可以挥霍身体——平衡是动态的，长期熬夜、压力过大，任何人都会失衡。保持规律作息和适度运动，是维持这种平衡最朴素的方式。'];
   var healthIndex=100-weak.length*10-(el.木>=4?10:0)-(el.火>=4?10:0);
   return{weak:weak,healthIndex:healthIndex,notes:notes};
@@ -900,6 +910,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
