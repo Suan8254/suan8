@@ -649,6 +649,9 @@ function getYiJingHexagram(question){
   var gd=guaData[guaNum+1]||guaData[1];
   var huMap=[0,34,5,26,11,10,14,36,19,20,16,35,45,12,33,39,62,52,37,22,15,47,28,44,43,24,21,3,27,50,64,56,40,7,59,29,4,60,39,30,55,16,62,53,60,45,28,4,54,36,50,43,63,17,49,48,13,18,57,32,44,24,47,41,22,30,59,34,60];
   var hn=huMap[guaNum];var hg=guaData[hn];
+  var huIntro=hn!==guaNum?'本卦之互卦为《'+hg.name+'》，暗示事态发展中有内部变化，需关注核心矛盾的转化。':'本卦无互卦变化，象意纯粹直接。';
+  var huMap=[0,34,5,26,11,10,14,36,19,20,16,35,45,12,33,39,62,52,37,22,15,47,28,44,43,24,21,3,27,50,64,56,40,7,59,29,4,60,39,30,55,16,62,53,60,45,28,4,54,36,50,43,63,17,49,48,13,18,57,32,44,24,47,41,22,30,59,34,60];
+  var hn=huMap[guaNum];var hg=guaData[hn];
   var huIntro=hn!==guaNum?'本卦互卦为《'+hg.name+'》，'+hg.name.replace(/.*/,'')+'，暗示事态发展中有内部变化，需关注核心矛盾的转化。':'本卦无互卦变化，象意纯粹直接。';
   var yaoCi=['初九：潜龙勿用。','六二：见龙在田，利见大人。','九三：君子终日乾乾，夕惕若厉。','九四：或跃在渊，无咎。','九五：飞龙在天，利见大人。','上九：亢龙有悔。'];
   var oracle={
@@ -659,7 +662,7 @@ function getYiJingHexagram(question){
     '慎':question+'之事，需谨慎行事，三思而后行，防小人在侧，宜稳不宜急。',
     '走':question+'之事，不利久留，考虑撤退或转移方向，避开不利因素。'
   };
-  return{guaNum:guaNum+1,name:gd.name,guaCi:gd.ci,img:gd.img,yaoCi:yaoCi,oracle:oracle[gd.strat]||oracle['观'],type:gd.type,strategy:gd.strat,strategyNote:gd.ov};
+  return{guaNum:guaNum+1,name:gd.name,guaCi:gd.ci,img:gd.img,yaoCi:yaoCi,oracle:oracle[gd.strat]||oracle['观'],type:gd.type,strategy:gd.strat,strategyNote:gd.ov,huguagName:hg.name,huguagIntro:huIntro};
 }
 
 // ══ LIU REN (小六壬) ══
@@ -828,6 +831,8 @@ function doYiJing(){
     html+='</div>';
     html+='<div style="display:inline-block;padding:8px 20px;border-radius:8px;background:'+stratColor+';color:#fff;font-size:.82rem;margin-bottom:12px">策略：'+r.strategy+'</div>';
     html+='<div style="background:rgba(42,36,32,.03);padding:14px;border-radius:10px;text-align:left;font-size:.88rem;line-height:1.75">'+r.oracle+'</div>';
+    
+    html+='<div style="margin-top:12px;padding:12px;background:rgba(90,90,140,.06);border-radius:8px;font-size:.82rem;line-height:1.7;color:var(--songyan)"><b style="color:var(--jin)">🔄 互卦：</b>'+r.huguagIntro+'</div>';
     document.getElementById('yijing-result').innerHTML=html;
   },800);
 }
@@ -907,9 +912,8 @@ function go(){
 
 function shareR(){if(navigator.share)navigator.share({title:'命理通·八字命盘',text:'来看看你的命运！',url:location.href});else alert('已复制链接！')}
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
-
-
 </script>
+
 
 
 
