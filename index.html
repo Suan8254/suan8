@@ -262,6 +262,7 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
 .ys-item{padding:14px;border-radius:10px;text-align:center}
 .ys-item.xi{background:rgba(90,122,90,.06);border:1px solid rgba(90,122,90,.12)}
 .ys-item.ji{background:rgba(192,64,48,.04);border:1px solid rgba(192,64,48,.08)}
+.ys-item.ming{background:rgba(90,90,140,.06);border:1px solid rgba(90,90,140,.15)}
 .ys-label{font-size:.68rem;color:var(--songyan);letter-spacing:2px;margin-bottom:6px}
 .ys-value{font-size:1.1rem;font-weight:700}
 
@@ -493,6 +494,15 @@ function getYongShen(dEl,str,el){
 }
 function getDaYun(ygi,mgi,mzi,g){var dir=((GY[ygi]==='阳'&&g==='男')||(GY[ygi]==='阴'&&g==='女'))?1:-1,dy=[];for(var i=0;i<8;i++){dy.push({step:i+1,s:TG[(mgi+(i+1)*dir)%10],b:DZ[(mzi+(i+1)*dir)%12],startAge:3+i*10,endAge:12+i*10});}return dy;}
 function getLiuNian(year,dayS){var gi=(year-4)%10,zi=(year-4)%12;return{gz:TG[gi]+DZ[zi],ss:getShiShen(dayS,TG[gi]),gi:gi,zi:zi};}
+
+
+// ══ MING GONG (Life Palace) ══
+function getMingGong(hourZhi){
+  var DZ_SEQ=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  var zhiIdx=DZ_SEQ.indexOf(hourZhi)+1; // 1-12
+  var mgIdx=(14-zhiIdx)%12;if(mgIdx<1)mgIdx+=12;
+  return TG[mgIdx-1]+DZ[mgIdx-1];
+}
 
 // ══ COMPLETE SHEN SHA (30+ stars) ══
 function getAllShenSha(dayS,pils){
@@ -839,10 +849,13 @@ function go(){
       document.getElementById('gjn').textContent=geju;
       var gjDescs={正官格:'正官当令——你骨子里是走正道的人，规则意识强，在大机构或体制内往往比在江湖上走得更稳。适合公职、管理、律师等需要信誉积累的领域。',七杀格:'七杀当令——你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技类领域是你的天然战场。',正印格:'正印高照——你学习能力强，吸收知识快，而且学进去的东西能真正转化为能力。适合走学术路线，或者成为某个领域的深度专家。',偏印格:'偏印独秀——你的才华不在主流赛道，深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财当令——稳健积累是你的主旋律。你不是那种靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业等。',偏财格:'偏财旺盛——你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'食神吐秀——你自带让人想靠近的气场，有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官泄秀——你有说出来就让人惊讶的天赋。但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄当令——你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃逢冲——你身上有不服输的血性，这是力量源，也需要方向约束。没有约束的力量比软弱更危险，适合军警、竞技、法律等强对抗领域。'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
+      
+      document.getElementById('ysg').insertAdjacentHTML('beforeend','<div class="ys-item ming"><div class="ys-label">命 宫</div><div class="ys-value" style="color:var(--jin)">'+mg+'</div></div>');
       document.getElementById('ysg').innerHTML='<div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+ys.xi.join(' · ')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+ys.ji.join(' · ')+'</div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
       document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
-      var curYear=new Date().getFullYear(),ln=getLiuNian(curYear,dayS);
+      var curYear=new Date().getFullYear();
+      var mg=getMingGong(hp.b),ln=getLiuNian(curYear,dayS);
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
       document.getElementById('lns').textContent='流年十神：'+ln.ss;
@@ -875,6 +888,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
