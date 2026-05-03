@@ -569,7 +569,11 @@ function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount){
   return{spouseStem:spouseStem,marriageAge:marriageAge,notes:notes};
 }
 
-// ══ CAREER / WEALTH READING ══
+    sha.push({name:'红鸾',type:'吉',desc:'主婚姻、喜庆，桃花星的一种，感情姻缘之星'});
+    sha.push({name:'天喜',type:'吉',desc:'与红鸾相配，主吉庆、嫁娶、添丁之喜'});
+    sha.push({name:'陀罗',type:'凶',desc:'主波折、阻碍、意外困扰，随运而行，不离不散'});
+    sha.push({name:'铃星',type:'凶',desc:'主突发性冲突、意外伤害，暗藏风险，宜守不宜攻'});
+    // ══ CAREER / WEALTH READING ══
 function buildCareerReading(dayS,monthSS,el,str,ssCount){
   var apt=[],wealth=[],notes=[];
   var aptMap={正官:'管理协调',七杀:'创业开拓',正印:'学术教育',偏印:'技术研究',正财:'财务会计',偏财:'投资贸易',食神:'艺术创意',伤官:'自由职业',比肩:'创业合伙',劫财:'销售竞技'};
@@ -602,7 +606,11 @@ function buildHealthReading(dayS,el,str){
   var notes=[];
   notes.push(organOpen[dayEl]);
   EN.forEach(function(e){if(el[e]===0){var lackOpen={木:'缺木的人肝胆较弱，情绪起伏时身体反应特别明显。春天多吃酸味食物，多去户外走动，对你来说是天然的养生。',火:'缺火的人心脏功能偏弱，血液循环不好，容易手脚冰凉。冬天怕冷、夏天反而比一般人舒服。红枣、桂圆、红豆这些暖性食物，对你特别有帮助。',土:'缺土的人脾胃偏弱，胃口容易受情绪影响。思虑过度时消化会明显变差。"少想多吃"不太适合你，反而"想清楚再吃"更适合你的体质。',金:'缺金的人肺气偏弱，呼吸系统抵抗力差。容易咳嗽、嗓子不舒服。白色食物（梨、银耳、百合）对你是天然的养肺利器。',水:'缺水的人肾气不足，容易疲劳、腰酸、性急。咸味食物适当增加能补肾，但要注意别过度。黑色食物（黑豆、黑芝麻）是你的日常养生首选。'};notes.push(lackOpen[e]);}});
-  if(notes.length===0||notes.length===1)notes=['五行较平衡，没有明显的先天短板。但这不意味着可以挥霍身体——平衡是动态的，长期熬夜、压力过大，任何人都会失衡。保持规律作息和适度运动，是维持这种平衡最朴素的方式。'];
+      if(ln.ss==='比肩')notes.push('红鸾星动，有同辈贵人相助，感情上容易出现暧昧竞争关系。');
+    if(ln.ss==='正财')notes.push('红鸾在命，天喜随行——今年有嫁娶或添丁吉兆，已婚者宜把握。');
+    if(ln.ss==='七杀')notes.push('陀罗、铃星入命，防意外冲突，决策前多停三天。');
+    if(ln.ss==='偏印')notes.push('陀罗在流年，宜保守推进，重大决策延后三个月。');
+      if(notes.length===0||notes.length===1)notes=['五行较平衡，没有明显的先天短板。但这不意味着可以挥霍身体——平衡是动态的，长期熬夜、压力过大，任何人都会失衡。保持规律作息和适度运动，是维持这种平衡最朴素的方式。'];
   var healthIndex=100-weak.length*10-(el.木>=4?10:0)-(el.火>=4?10:0);
   return{weak:weak,healthIndex:healthIndex,notes:notes};
 }
@@ -888,6 +896,7 @@ var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.g
 
 
 </script>
+
 
 
 
