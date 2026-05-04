@@ -291,6 +291,8 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
 .hl-label{flex:0 0 70px;font-size:.72rem;color:var(--songyan);letter-spacing:2px}
 .hl-bar-wrap{flex:1;height:10px;background:rgba(42,36,32,.06);border-radius:5px;overflow:hidden}
 .hl-bar{height:100%;background:var(--mu);border-radius:5px;transition:width 1s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:.62rem;color:#fff;font-weight:700}
+.lr-input-row{display:flex;gap:8px;margin-bottom:16px}
+.lr-input-row select{flex:1;padding:10px 8px;font-size:.88rem;border:1px solid var(--paper);border-radius:8px;background:#fff;color:var(--mo);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6058' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer}
 .hl-organs{margin-bottom:14px;font-size:.82rem}
 /* YiJing */
 .yj-box{padding:4px 0}
@@ -412,7 +414,7 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
   <div class="section fade-in s9"><div class="section-title">健 康 养 生</div><div class="hl-header"><div class="hl-label">健康指数</div><div class="hl-bar-wrap"><div class="hl-bar" id="hl-bar" style="width:80%"></div></div></div><div class="hl-organs"><b>需注意器官：</b><span id="hl-organs">—</span></div><div class="ln-detail" id="hl-notes"></div></div>
 
   <!-- 9e. Liu Ren -->
-  <div class="section fade-in s9"><div class="section-title">今 日 小 六 壬</div><div id="liuren-result" style="text-align:center"><div style="padding:12px;color:var(--songyan);font-size:.85rem">点击下方按钮获取今日速断</div></div><button class="submit-btn" style="margin-top:12px;background:var(--zhusha);font-size:.88rem;letter-spacing:2px" onclick="doLiuRen()">看今日运势</button></div>
+  <div class="section fade-in s9"><div class="section-title">小 六 壬 · 占 卜</div><div class="lr-input-row"><select id="lr-month"><option value="">月</option><option value="1">正月</option><option value="2">二月</option><option value="3">三月</option><option value="4">四月</option><option value="5">五月</option><option value="6">六月</option><option value="7">七月</option><option value="8">八月</option><option value="9">九月</option><option value="10">十月</option><option value="11">冬月</option><option value="12">腊月</option></select><select id="lr-day"><option value="">日</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option></select><select id="lr-hour"><option value="">时辰</option><option value="0">子 (23-01)</option><option value="1">丑 (01-03)</option><option value="2">寅 (03-05)</option><option value="3">卯 (05-07)</option><option value="4">辰 (07-09)</option><option value="5">巳 (09-11)</option><option value="6">午 (11-13)</option><option value="7">未 (13-15)</option><option value="8">申 (15-17)</option><option value="9">酉 (17-19)</option><option value="10">戌 (19-21)</option><option value="11">亥 (21-23)</option></select></div><div id="liuren-result" style="text-align:center"><div style="padding:12px;color:var(--songyan);font-size:.85rem">输入日期后点击下方按钮</div></div><button class="submit-btn" style="margin-top:12px;background:var(--zhusha);font-size:.88rem;letter-spacing:2px" onclick="doLiuRen()">开 始 占 卜</button></div>
 
   <!-- 9f. YiJing -->
   <div class="section fade-in s9"><div class="section-title">易 经 占 卜</div><div class="yj-box"><input type="text" id="yijing-question" placeholder="心中默念问题，然后点击起卦" class="yj-input"><button class="submit-btn" style="background:var(--mo);font-size:.88rem" onclick="doYiJing()">🧘 起 卦</button><div id="yijing-result" style="margin-top:16px"></div></div></div>
@@ -678,10 +680,10 @@ function getYiJingHexagram(question){
 }
 
 // ══ LIU REN (小六壬) ══
-function getLiuRen(){
-  var now=new Date(),lm=now.getMonth()+1,ld=now.getDate(),lh=now.getHours();
-  var mIdx=lm;
-  var dIdx=((ld+2)%6)||6;
+function getLiuRen(month,day,hour){
+  var mIdx=month||1;
+  var dIdx=((day+2)%6)||6;
+  var lh=hour||0;
   var positions=['大安','留连','赤口','小吉','空亡','速喜'];
   var meanings={'大安':{mean:'身不动时，大安。万事求安，行事顺利，无风险。',advice:'诸事平稳，宜守成，不宜冒险激进。',good:'求财、谈判、签约、远行均吉。',bad:'大安本身平和，但过于安稳可能错失机会。'},'留连':{mean:'人未归时，留连。运势滞涩不进，暧昧不明。',advice:'时机未到，不宜强求，需耐心等待。感情有暗昧不明之事。',good:'感情暧昧期有利，宜观察。',bad:'财运受阻，不宜投资，防小人纠缠。'},'赤口':{mean:'官事凶，赤口。官非争执，口舌是非，意外伤灾。',advice:'防口舌官非，不宜与人口角，少说话多做事。',good:'对小人而言赤口有利，对好人则凶。',bad:'防意外金属伤害，防火光之灾。'},'小吉':{mean:'人来喜，小吉。人縁和合，所求顺遂，办事通达。',advice:'万事吉兆，人缘好，办事顺，宜社交、婚嫁、求职。',good:'利人际交往，利合作，利表白求婚。',bad:'小吉之后易有回落，宜趁势而上。'},'空亡':{mean:'虚无何也，空亡。谋事成空，劳而无功，一无所获。',advice:'不宜新开始的项目，不宜投资，不宜远行。',good:'空亡之后必有实，利反思总结。',bad:'防破财，防上当，防签空头合同。'},'速喜':{mean:'喜即至，速喜。喜事临门，消息速来，办事速成。',advice:'好消息即将来临，宜把握时机，主动出击。',good:'利远行来信，利搬迁，利考试，利表白成功。',bad:'速喜来得快也去得快，宜抓紧行动。'}};
   var pos=positions[(mIdx+dIdx+lh)%6]||positions[0];
@@ -855,13 +857,28 @@ function doLiuRen(){
   var btn=document.querySelector('[onclick="doLiuRen()"]');
   var el=document.getElementById('liuren-result');
   if(!el){if(btn)btn.textContent='页面加载中，请稍候';return;}
-  if(btn){btn.textContent='计算中...';btn.disabled=true;}
+  var monthEl=document.getElementById('lr-month');
+  var dayEl=document.getElementById('lr-day');
+  var hourEl=document.getElementById('lr-hour');
+  var month=monthEl?parseInt(monthEl.value):0;
+  var day=dayEl?parseInt(dayEl.value):0;
+  var hour=hourEl?parseInt(hourEl.value):0;
+  if(!month||!day){
+    var now=new Date();if(!month)month=now.getMonth()+1;
+    if(!day)day=now.getDate();
+    if(!hour)hour=Math.floor(now.getHours()/2)%12;
+    if(monthEl)monthEl.value=month;
+    if(dayEl)dayEl.value=day;
+    if(hourEl)hourEl.value=hour;
+  }
+  if(!month||!day){el.innerHTML='<div style="padding:16px;text-align:center;color:var(--zhusha);font-size:.88rem">请选择月、日</div>';if(btn)btn.disabled=false;return;}
+  if(btn){btn.textContent='占卜中...';btn.disabled=true;}
   el.scrollIntoView({behavior:'smooth',block:'center'});
   try{
-    var r=getLiuRen();
+    var r=getLiuRen(month,day,hour);
     var stratColor={大安:'var(--mu)',留连:'var(--songyan)',赤口:'var(--zhusha)',小吉:'var(--jin)',空亡:'var(--tu)',速喜:'var(--huo)'}[r.position]||'var(--songyan)';
     el.innerHTML='<div style="text-align:center;margin-bottom:14px"><div style="font-family:LXGW WenKai,serif;font-size:1.8rem;font-weight:700;color:'+stratColor+'">'+r.position+'</div><div style="font-size:.78rem;color:var(--songyan);margin-top:4px">小六壬 · 今日速断</div></div><div style="background:var(--card);padding:14px;border-radius:10px;text-align:left;font-size:.85rem;line-height:1.75">'+r.mean+'</div><div style="margin-top:12px"><div style="font-size:.72rem;color:var(--mu);letter-spacing:2px;margin-bottom:6px">✓ 宜</div><div style="font-size:.82rem;margin-bottom:10px">'+r.good+'</div><div style="font-size:.72rem;color:var(--zhusha);letter-spacing:2px;margin-bottom:6px">⚠ 忌</div><div style="font-size:.82rem">'+r.bad+'</div></div>';
-    if(btn){btn.textContent='再看一次';btn.disabled=false;}
+    if(btn){btn.textContent='重新占卜';btn.disabled=false;}
   }catch(err){
     console.error('小六壬出错:',err);
     el.innerHTML='<div style="padding:16px;text-align:center;color:var(--zhusha);font-size:.85rem">计算出错，请刷新重试</div>';
@@ -939,6 +956,7 @@ function shareR(){if(navigator.share)navigator.share({title:'命理通·八字�
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 
 </script>
+
 
 
 
