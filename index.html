@@ -887,6 +887,17 @@ function doLiuRen(){
 }
 function toggleDiv(id){var el=document.getElementById(id);if(!el)return;var cur=el.style.display;el.style.display=cur==='none'?'block':'none';}
 
+// ══ LIUREN AUTO-FILL ══
+(function(){
+  var n=new Date(),m=n.getMonth()+1,d=n.getDate(),h=n.getHours();
+  var mm=document.getElementById('lr-month'),dd=document.getElementById('lr-day'),hh=document.getElementById('lr-hour');
+  if(mm)mm.value=m;
+  if(dd)dd.value=d;
+  if(hh)hh.value=Math.floor(h/2)%12||6;
+  var el=document.getElementById('liuren-result');
+  if(el)el.innerHTML='<div style="padding:12px;text-align:center;color:var(--songyan);font-size:.85rem">日期已设为今日，请核验后点击下方按钮</div>';
+})();
+
 // ══ MAIN CALCULATION ══
 function go(){
   var y=+document.getElementById('by').value,m=+document.getElementById('bm').value,d=+document.getElementById('bd').value;
@@ -956,6 +967,7 @@ function shareR(){if(navigator.share)navigator.share({title:'命理通·八字�
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 
 </script>
+
 
 
 
