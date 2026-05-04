@@ -851,11 +851,22 @@ function doYiJing(){
 }
 
 function doLiuRen(){
-  var r=getLiuRen();
-  var stratColor={大安:'var(--mu)',留连:'var(--songyan)',赤口:'var(--zhusha)',小吉:'var(--jin)',空亡:'var(--tu)',速喜:'var(--huo)'}[r.position]||'var(--songyan)';
-  document.getElementById('liuren-result').innerHTML='<div style="text-align:center;margin-bottom:14px"><div style="font-family:LXGW WenKai,serif;font-size:1.8rem;font-weight:700;color:'+stratColor+'">'+r.position+'</div><div style="font-size:.78rem;color:var(--songyan);margin-top:4px">小六壬 · 今日速断</div></div><div style="background:var(--card);padding:14px;border-radius:10px;text-align:left;font-size:.85rem;line-height:1.75">'+r.mean+'</div><div style="margin-top:12px"><div style="font-size:.72rem;color:var(--mu);letter-spacing:2px;margin-bottom:6px">✓ 宜</div><div style="font-size:.82rem;margin-bottom:10px">'+r.good+'</div><div style="font-size:.72rem;color:var(--zhusha);letter-spacing:2px;margin-bottom:6px">⚠ 忌</div><div style="font-size:.82rem">'+r.bad+'</div></div>';
+  var btn=document.querySelector('[onclick="doLiuRen()"]');
+  var el=document.getElementById('liuren-result');
+  if(!el){if(btn)btn.textContent='页面加载中，请稍候';return;}
+  if(btn){btn.textContent='计算中...';btn.disabled=true;}
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  try{
+    var r=getLiuRen();
+    var stratColor={大安:'var(--mu)',留连:'var(--songyan)',赤口:'var(--zhusha)',小吉:'var(--jin)',空亡:'var(--tu)',速喜:'var(--huo)'}[r.position]||'var(--songyan)';
+    el.innerHTML='<div style="text-align:center;margin-bottom:14px"><div style="font-family:LXGW WenKai,serif;font-size:1.8rem;font-weight:700;color:'+stratColor+'">'+r.position+'</div><div style="font-size:.78rem;color:var(--songyan);margin-top:4px">小六壬 · 今日速断</div></div><div style="background:var(--card);padding:14px;border-radius:10px;text-align:left;font-size:.85rem;line-height:1.75">'+r.mean+'</div><div style="margin-top:12px"><div style="font-size:.72rem;color:var(--mu);letter-spacing:2px;margin-bottom:6px">✓ 宜</div><div style="font-size:.82rem;margin-bottom:10px">'+r.good+'</div><div style="font-size:.72rem;color:var(--zhusha);letter-spacing:2px;margin-bottom:6px">⚠ 忌</div><div style="font-size:.82rem">'+r.bad+'</div></div>';
+    if(btn){btn.textContent='再看一次';btn.disabled=false;}
+  }catch(err){
+    console.error('小六壬出错:',err);
+    el.innerHTML='<div style="padding:16px;text-align:center;color:var(--zhusha);font-size:.85rem">计算出错，请刷新重试</div>';
+    if(btn){btn.textContent='看今日运势';btn.disabled=false;}
+  }
 }
-
 function toggleDiv(id){var el=document.getElementById(id);if(!el)return;var cur=el.style.display;el.style.display=cur==='none'?'block':'none';}
 
 // ══ MAIN CALCULATION ══
@@ -926,6 +937,7 @@ function go(){
 function shareR(){if(navigator.share)navigator.share({title:'命理通·八字命盘',text:'来看看你的命运！',url:location.href});else alert('已复制链接！')}
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
 </script>
+
 
 
 
