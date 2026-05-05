@@ -602,6 +602,19 @@ function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount,ln){
     sha.push({name:'孤辰',type:'凶',desc:'主独立、不合群，社交关系浅而难深入'});
     // ══ CAREER / WEALTH READING ══
 function buildCareerReading(dayS,monthSS,el,str,ssCount){
+  var pils=arguments[5]||null;
+  // Month-branch strength: how 月令 affects career trajectory
+  var mBEl=ZE[pils[1].b];
+  var mBMod=mBEl==='木'?1.3:mBEl==='火'?1.2:mBEl==='土'?1.1:mBEl==='金'?0.9:mBEl==='水'?0.85:1.0;
+  if(mBMod>1&&(str==='旺'||str==='偏旺')){
+    notes.push('月令为'+mBEl+'，与日主同气——你骨子里有一种天然的顺遂感，机遇比常人来得更容易一些。但顺势时要保持清醒，顺境最易滋生懈怠。');
+    aptIndex=Math.min(95,Math.round(aptIndex*mBMod));
+  }else if(mBMod<1&&(str==='弱'||str==='偏弱')){
+    notes.push('月令为'+mBEl+'，克制日主——你前进路上总有一种被压着的感觉，不是你不够好，是时机还没到。坚持下去，等大运转换，潜力才会真正释放。');
+    aptIndex=Math.round(aptIndex*mBMod);
+    wealthIndex=Math.round(wealthIndex*mBMod);
+  }
+  
   var apt=[],wealth=[],notes=[];
   var aptMap={正官:'管理协调',七杀:'创业开拓',正印:'学术教育',偏印:'技术研究',正财:'财务会计',偏财:'投资贸易',食神:'艺术创意',伤官:'自由职业',比肩:'创业合伙',劫财:'销售竞技'};
   if(aptMap[monthSS])apt.push(aptMap[monthSS]);
@@ -850,6 +863,7 @@ function doYiJing(){
     html+='</div>';
     html+='<div style="display:inline-block;padding:8px 20px;border-radius:8px;background:'+stratColor+';color:#fff;font-size:.82rem;margin-bottom:12px">策略：'+r.strategy+'</div>';
     html+='<div style="background:rgba(42,36,32,.03);padding:14px;border-radius:10px;text-align:left;font-size:.88rem;line-height:1.75">'+r.oracle+'</div>';
+    html+='<div style="margin-top:10px;padding:10px 14px;background:rgba(200,168,80,.06);border-radius:8px;font-size:.8rem;color:var(--songyan);line-height:1.65">💡 <b>卦象解读：</b>'+(r.strategyNote||'')+'</div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(74,106,138,.06);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">★ 互午 — 内在变化</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--jin)">《'+r.huguagName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+r.huguagIntro+'</div></div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(192,80,48,.04);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">➒ 之午 — 变化结果</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--zhusha)">《'+r.zhiguaName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+(r.changing&&r.changing.length>0?'此午有'+r.changing.length+'屙动，变屙翻转后得之午《'+r.zhiguaName+'》，代表此事的最终越向。':'无变屙，之午即本八，八象之意以本八为主。')+'</div></div>';
     document.getElementById('yijing-result').innerHTML=html;
@@ -900,6 +914,16 @@ function toggleDiv(id){var el=document.getElementById(id);if(!el)return;var cur=
   if(el)el.innerHTML='<div style="padding:12px;text-align:center;color:var(--songyan);font-size:.85rem">日期已设为今日，请核验后点击下方按钮</div>';
 })();
 
+// ══ INIT：小六壬下拉自动填充当前日期 ══
+(function initLiuRen(){
+  var now=new Date();
+  var m=now.getMonth()+1,d=now.getDate(),h=Math.floor(now.getHours()/2)%12;
+  var me=document.getElementById('lr-month'),de=document.getElementById('lr-day'),he=document.getElementById('lr-hour');
+  if(me)me.value=m;
+  if(de)de.value=d;
+  if(he)he.value=h;
+})();
+
 // ══ MAIN CALCULATION ══
 function go(){
   var y=+document.getElementById('by').value,m=+document.getElementById('bm').value,d=+document.getElementById('bd').value;
@@ -944,7 +968,9 @@ function go(){
       var lnDescs={比肩:'今年自我意识抬头，适合独立推进一些事情。不必太在意别人怎么看你，按自己的节奏走就好。但注意：独行不等于孤立，适当借力会让路走得更顺。',劫财:'今年花钱的地方会比较多——可能是投资、健康、或是意料之外的开支。提前做好财务规划，留一部分备用金，别让钱的问题影响心情。',食神:'今年整体状态会比较愉快，创造力和感受力都在线。适合学点新东西，发展兴趣爱好，也适合在生活上给自己一点小确幸。',伤官:'今年脑子特别活，点子多，但也容易说太多或想太多。口舌是非是这一年的高发区——说话前多停三秒，能避开不少麻烦。',偏财:'今年偏财运不错，可能是副业、投资或意外收入。但记住：机会好的时候也是最容易冲动的时候，设好止损线再出手。',正财:'今年正财稳定，适合做置业、储蓄、长期理财等规划。工作上如果有机会谈薪资或合作条件，今年是开口的好时机。',七杀:'今年压力不小，可能是工作、竞争或来自权威的施压。但别慌——七杀压顶往往是突破前的信号。你的魄力今年是你最大的武器。',正官:'今年贵人运强，做事容易得到认可和帮助。如果有晋升、合作、考编的机会今年值得积极争取。遇到难处时记得主动开口，别人愿意拉你一把。',偏印:'今年学习运不错，适合进修、学新技能、或者考个证书。也适合做一些需要深度思考的复盘工作，为下一步打好基础。',正印:'今年思路清晰，学业和工作都比较顺。适合把之前积累的东西整理输出——写文章、做分享、梳理经验。今年你说出的话比平时更有分量。'};
       document.getElementById('lnd').innerHTML='<div class="ln-item">'+(lnDescs[ln.ss]||'流年平稳。')+'</div><div class="ln-item">流年五行属'+GE[ln.gi]+'，与日主关系'+ln.ss+'。</div><div class="ln-item">建议：多亲近'+ys.xi.join('、')+'，远离'+ys.ji.join('、')+'。</div>';
       var sha=getAllShenSha(dayS,pils);
+      var mingGong=getMingGong(pils[3].b);
       document.getElementById('shg').innerHTML=sha.map(function(s){return'<div class="sha-item '+(s.type==='吉'?'ji':'xiong')+'"><div class="sha-name">'+s.name+'</div><span class="sha-type '+(s.type==='吉'?'ji-t':'xiong-t')+'">'+s.type+'</span><div class="sha-meaning">'+s.desc+'</div></div>';}).join('');
+      document.getElementById('shg').innerHTML+='<div class="sha-item" style="background:rgba(192,64,48,.05);border-color:rgba(192,64,48,.15)"><div class="sha-name">命宫</div><span class="sha-type" style="background:var(--zhusha);color:#fff">'+mingGong+'</span><div class="sha-meaning">时辰对应的人生主场</div></div>';
       var mrr=buildMarriageReading(dayS,monthSS,pils,el,str,ssCount,ln);
       document.getElementById('mrr-spouse').textContent=mrr.spouseStem;
       document.getElementById('mrr-age').textContent=mrr.marriageAge;
