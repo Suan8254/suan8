@@ -933,9 +933,9 @@ function go(){
       document.getElementById('ysg').innerHTML='<div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+ys.xi.join(' · ')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+ys.ji.join(' · ')+'</div></div><div class="ys-item yi-note"><div class="ys-label">命理解读</div><div class="ys-value" style="font-size:.78rem;color:var(--songyan);line-height:1.6">'+ys.explanation+'<div class="ys-item yi-note"><div class="ys-label">命理解读</div><div class="ys-value" style="font-size:.78rem;color:var(--songyan);line-height:1.6">'+ys.explanation+'</div></div></div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
       document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
-      document.getElementById('dyt').insertAdjacentHTML('beforebegin','<div style="margin:8px 0 4px;text-align:center;font-size:.72rem;color:var(--songyan);letter-spacing:1px">胎元 '+ty+'  ·  身宫 '+sg+'</div>');
       var curYear=new Date().getFullYear();
       var mg=getMingGong(hp.b),ty=getTaiYuan(yp,mp),sg=getShenGong(hp),ln=getLiuNian(curYear,dayS);
+      document.getElementById('dyt').insertAdjacentHTML('beforebegin','<div style="margin:8px 0 4px;text-align:center;font-size:.72rem;color:var(--songyan);letter-spacing:1px">胎元 '+ty+'  ·  身宫 '+sg+'</div>');
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
       document.getElementById('lns').textContent='流年十神：'+ln.ss;
