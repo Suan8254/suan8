@@ -987,6 +987,16 @@ function go(){
       document.getElementById('hl-bar').style.width=hlr.healthIndex+'%';
       document.getElementById('hl-bar').textContent=hlr.healthIndex+'%';
       document.getElementById('hl-notes').innerHTML=hlr.notes.map(function(n){return'<div class="ln-item">'+n+'</div>';}).join('');
+      // ── 命理详断 cards ──
+      var rdgHTML='<div class="reading-card"><div class="reading-title">年柱 · 祖荫</div><div class="reading-text">'+pils[0].s+pils[0].b+' | '+GE[pils[0].gi]+'气 | 十神：'+getShiShen(dayS,pils[0].s)+'</div><div class="reading-text">藏干：'+(ZCG[pils[0].b]||[]).join(' ')+'</div></div>';
+      rdgHTML+='<div class="reading-card"><div class="reading-title">月柱 · 父母</div><div class="reading-text">'+pils[1].s+pils[1].b+' | '+GE[pils[1].gi]+'气 | 十神：'+getShiShen(dayS,pils[1].s)+'</div><div class="reading-text">藏干：'+(ZCG[pils[1].b]||[]).join(' ')+'</div></div>';
+      rdgHTML+='<div class="reading-card"><div class="reading-title">日柱 · 己身</div><div class="reading-text">'+pils[2].s+pils[2].b+' | '+GE[pils[2].gi]+'气 | 日主：'+dayS+'</div><div class="reading-text">藏干：'+(ZCG[pils[2].b]||[]).join(' ')+'</div></div>';
+      rdgHTML+='<div class="reading-card"><div class="reading-title">时柱 · 子女</div><div class="reading-text">'+pils[3].s+pils[3].b+' | '+GE[pils[3].gi]+'气 | 十神：'+getShiShen(dayS,pils[3].s)+'</div><div class="reading-text">藏干：'+(ZCG[pils[3].b]||[]).join(' ')+'</div></div>';
+      var topSSName=Object.entries(ssCount).sort(function(a,b){return b[1]-a[1]})[0];
+      rdgHTML+='<div class="reading-card"><div class="reading-title">十神总览</div><div class="reading-text">主导十神：'+topSSName[0]+'('+topSSName[1]+'个)</div><div class="reading-text">喜神：'+(ys&&ys.xi?ys.xi.join('、'):'—')+'&nbsp;&nbsp;忌神：'+(ys&&ys.ji?ys.ji.join('、'):'—')+'</div></div>';
+      rdgHTML+='<div class="reading-card"><div class="reading-title">格局 · 大运</div><div class="reading-text">命格：'+geju+'</div><div class="reading-text">大运首步：'+dayun[0].s+dayun[0].b+'('+dayun[0].startAge+'-'+dayun[0].endAge+'岁)</div></div>';
+      rdgHTML+='<div class="reading-card"><div class="reading-title">神煞系统</div><div class="reading-text">吉神：'+(sha.filter(function(s){return s.type==='\u5409'}).slice(0,3).map(function(s){return s.name;}).join('、')||'—')+'</div><div class="reading-text">凶煞：'+(sha.filter(function(s){return s.type==='\u51F6'}).slice(0,3).map(function(s){return s.name;}).join('、')||'—')+'</div></div>';
+      document.getElementById('rdg').innerHTML=rdgHTML;
       doLiuRen();
       showPage('results-page');
     }catch(err){console.error('排盘出错:',err);alert('计算出错: '+err.message);}
