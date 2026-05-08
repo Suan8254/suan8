@@ -860,7 +860,7 @@ function doYiJing(){
     html+='<div style="margin-top:10px;padding:10px 14px;background:rgba(200,168,80,.06);border-radius:8px;font-size:.8rem;color:var(--songyan);line-height:1.65">💡 <b>卦象解读：</b>'+(r.strategyNote||'')+'</div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(74,106,138,.06);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">★ 互午 — 内在变化</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--jin)">《'+r.huguagName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+r.huguagIntro+'</div></div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(192,80,48,.04);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">➒ 之午 — 变化结果</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--zhusha)">《'+r.zhiguaName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+(r.changing&&r.changing.length>0?'此午有'+r.changing.length+'屙动，变屙翻转后得之午《'+r.zhiguaName+'》，代表此事的最终越向。':'无变屙，之午即本八，八象之意以本八为主。')+'</div></div>';
-    document.getElementById('yijing-result').innerHTML=html;
+    document.getElementById('yijing-result').innerHTML='<div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap"><div style="flex:0 0 220px">'+buildYiJingWheelSVG(r)+'</div><div style="flex:1;min-width:180px"><div style="font-size:1.5rem;font-family:LXGW WenKai,serif;color:var(--zhusha);margin-bottom:6px">《'+r.gua+'》 '+r.img+'</div><div style="font-size:.8rem;color:var(--songyan);line-height:1.85;margin-bottom:8px">'+r.guaCi+'</div><div style="font-size:.75rem;color:var(--songyan);line-height:1.7;margin-bottom:8px">'+r.yaoCi.join('<br>')+'</div><div style="font-size:.78rem;color:var(--mo);padding:10px 12px;background:var(--card);border-radius:8px;margin-bottom:8px">'+r.strategy+' '+r.strategyNote+'</div></div></div>'+html;
   },800);
 }
 function doLiuRen(){
@@ -931,9 +931,9 @@ function go(){
       lastPillars=pils;lastDayS=dayS;
       document.getElementById('rn').textContent=name?name+' 的命盘全解':'命盘全解';
       document.getElementById('rm').textContent='公历 '+y+'年'+m+'月'+d+'日 '+DZ[hi]+'时 | '+gender+' | '+GY[dp.gi]+dEl+'命';
-      document.getElementById('pil').innerHTML=pils.map(function(p,i){var se=GE[p.gi],be=ZE[p.zi],ss=i===2?'日主':getShiShen(dayS,p.s),cg=ZCG[p.b]||[];return'<div class="pillar" ontouchstart="onPillarDown(event,'+i+')" ontouchend="onPillarUp()" ontouchcancel="onPillarUp()" oncontextmenu="event.preventDefault();showTT('+i+')"><div class="info-btn" onclick="event.stopPropagation();showTT('+i+')">?</div><div class="p-label">'+labels[i]+'</div><div class="p-stem" style="color:var(--'+getElVar(se)+')">'+p.s+'</div><div class="p-branch" style="color:var(--'+getElVar(be)+')">'+p.b+'</div><div class="p-shishen">'+ss+'</div><span class="tag el-'+se+'">'+se+'</span><div class="p-canggan">藏 '+(cg.length?cg.join(' '):'')+'</div></div>';}).join('');
+      document.getElementById('pil').innerHTML=buildFourPillarsSVG(pils,dayS,hp,el);
       var mx=Math.max.apply(null,EN.map(function(n){return el[n]}))||1;
-      document.getElementById('elb').innerHTML=EN.map(function(n){return'<div class="el-item"><div class="el-track"><div class="el-fill" style="height:'+(el[n]/mx*100)+'%;background:var(--'+getElVar(n)+')"></div></div><div class="el-name">'+n+'</div><div class="el-cnt">'+el[n]+'</div></div>';}).join('');
+      document.getElementById('elb').innerHTML=EN.map(function(n){var pct=Math.round(el[n]/mx*100);var bc={木:'#5a7a5a',火:'#c05050',土:'#b8956a',金:'#c8a850',水:'#4a6a8a'}[n];return'<div class="el-item"><div class="el-track"><div class="el-fill" style="height:'+pct+'%;background:'+bc+';border-radius:3px;transition:height .8s ease"></div></div><div class="el-name">'+n+'</div><div class="el-cnt">'+el[n]+'</div></div>';}).join('');
       var ssCount=countShiShen(dayS,pils),monthSS=getShiShen(dayS,mp.s),geju=getGeJu(monthSS),ys=getYongShen(dEl,str,el);
       var pers=buildPersonality(dayS,str,ssCount,el,geju);
       document.getElementById('dmc').textContent=dayS;
@@ -945,6 +945,7 @@ function go(){
       document.getElementById('ptx').innerHTML=pers.text.split('\n').filter(function(p){return p.trim()}).map(function(p){return'<div class="ln-item">'+p+'</div>';}).join('');
       var ssDescs={比肩:'独立自主，同辈助力，但过旺则争强好胜',劫财:'竞争心重，财来财去，社交场合的存在感',食神:'才华福气，感受力强，懂得享受生活',伤官:'创意叛逆，不走寻常路，表达能力出众',偏财:'意外之财，人缘通达，对金钱嗅觉灵敏',正财:'稳定收入，务实理财，感情上专一可靠',七杀:'权威压力，敢闯敢拼，魄力十足但需防冲动',正官:'贵人名声，规则意识强，在体制内容易出头',偏印:'偏才技艺，直觉敏锐，擅长技术或冷门领域',正印:'学识庇护，学习能力强，有慈悲心'};
       document.getElementById('ssg').innerHTML=Object.entries(ssCount).map(function(x){return'<div class="ss-item"><div class="ss-name">'+x[0]+'</div><div class="ss-count">'+x[1]+'</div><div class="ss-desc">'+ssDescs[x[0]]+'</div></div>';}).join('');
+      document.getElementById('ssg').insertAdjacentHTML('afterend','<div class="section fade-in" style="margin-top:8px;padding:16px 28px 12px"><div class="section-label">十 神 星 盘</div>'+buildShiShenRadarSVG(ssCount,dayS)+'</div>');
       document.getElementById('gjn').textContent=geju;
       var gjDescs={正官格:'正官当令——你骨子里是走正道的人，规则意识强，在大机构或体制内往往比在江湖上走得更稳。适合公职、管理、律师等需要信誉积累的领域。',七杀格:'七杀当令——你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技类领域是你的天然战场。',正印格:'正印高照——你学习能力强，吸收知识快，而且学进去的东西能真正转化为能力。适合走学术路线，或者成为某个领域的深度专家。',偏印格:'偏印独秀——你的才华不在主流赛道，深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财当令——稳健积累是你的主旋律。你不是那种靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业等。',偏财格:'偏财旺盛——你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'食神吐秀——你自带让人想靠近的气场，有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官泄秀——你有说出来就让人惊讶的天赋。但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄当令——你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃逢冲——你身上有不服输的血性，这是力量源，也需要方向约束。没有约束的力量比软弱更危险，适合军警、竞技、法律等强对抗领域。'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
@@ -953,7 +954,7 @@ function go(){
       var mg=getMingGong(hp.b),ty=getTaiYuan(yp,mp),sg=getShenGong(hp),ln=getLiuNian(curYear,dayS);
       document.getElementById('ysg').innerHTML='<div class="ys-item ming"><div class="ys-label">命 宫</div><div class="ys-value" style="color:var(--jin)">'+mg+'</div></div><div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+(ys&&ys.xi?ys.xi.join(' · '):'—')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+(ys&&ys.ji?ys.ji.join(' · '):'—')+'</div></div><div class="ys-item yi-note"><div class="ys-label">命理解读</div><div class="ys-value" style="font-size:.78rem;color:var(--songyan);line-height:1.6">'+(ys&&ys.explanation?ys.explanation:'—')+'</div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
-      document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
+      document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('')+buildDaYunTimelineSVG(dayun,pils,dayS,gender);
       document.getElementById('dyt').insertAdjacentHTML('beforebegin','<div style="margin:8px 0 4px;text-align:center;font-size:.72rem;color:var(--songyan);letter-spacing:1px">胎元 '+ty+'  ·  身宫 '+sg+'</div>');
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
@@ -1035,6 +1036,290 @@ function go(){
 
 function shareR(){if(navigator.share)navigator.share({title:'命理通·八字命盘',text:'来看看你的命运！',url:location.href});else alert('已复制链接！')}
 var cnt=38492;setInterval(function(){cnt+=Math.floor(Math.random()*3);document.getElementById('cnt').textContent=cnt.toLocaleString()},8000);
+
+
+// ══ VISUALISATIONS MODULE ══
+// ═══════════════════════════════════════════════════════════
+//  VISUALISATIONS MODULE — 命理通
+//  Adds: 四柱图, 五行柱, 十神雷达, 大运时间轴, 易经卦盘
+// ═══════════════════════════════════════════════════════════
+
+function buildFourPillarsSVG(pils,dayS,hp,el){
+  // pils = [yearP, monthP, dayP, hourP]
+  // el = {木,火,土,金,水}
+  // Colors per element
+  var c={木:'#5a7a5a',火:'#c05050',土:'#b8956a',金:'#c8a850',水:'#4a6a8a'};
+  function barH(v){return Math.round(v/8*160);}
+  function barColor(v){
+    if(v>=5)return'#c04030';
+    if(v>=3)return c.木;
+    if(v>=1)return c.水;
+    return'rgba(107,96,88,0.3)';
+  }
+  var els=[
+    {k:'木',v:el.木,color:barColor(el.木)},
+    {k:'火',v:el.火,color:barColor(el.火)},
+    {k:'土',v:el.土,color:barColor(el.土)},
+    {k:'金',v:el.金,color:barColor(el.金)},
+    {k:'水',v:el.水,color:barColor(el.水)}
+  ];
+  var maxV=Math.max.apply(null,els.map(function(e){return e.v}))||1;
+  var maxH=160;
+  // Build bar SVG snippets
+  var barSVGs='';
+  var x=0;
+  els.forEach(function(e){
+    var h=Math.max(4,Math.round(e.v/maxV*maxH));
+    barSVGs+='<rect x="'+x+'" y="'+(maxH-h)+'" width="36" height="'+h+'" fill="'+e.color+'" rx="3" opacity="0.85"/>';
+    barSVGs+='<text x="'+(x+18)+'" y="'+(maxH+14)+'" text-anchor="middle" font-size="11" fill="#6b6058">'+e.k+e.v+'</text>';
+    x+=44;
+  });
+
+  var rows=[
+    {label:'年',p:pils[0],bg:'rgba(74,106,138,0.06)'},
+    {label:'月',p:pils[1],bg:'rgba(192,64,48,0.06)'},
+    {label:'日',p:pils[2],bg:'rgba(90,122,90,0.10)'},
+    {label:'时',p:pils[3],bg:'rgba(200,168,80,0.06)'}
+  ];
+
+  var pillarCells='';
+  rows.forEach(function(row,i){
+    var p=row.p;
+    var stemColor=c[GE[p.gi]]||'#6b6058';
+    var branchColor=c[ZE[p.b]]||'#6b6058';
+    var isDay=i===2;
+    // Hidden stems
+    var hStems='';
+    if(p.zi2!==undefined&&p.zi2!==null){
+      var h2el=GE[p.zi2]||'水';
+      hStems+='<tspan fill="'+c[h2el]+'">·'+TG[p.zi2]+'</tspan>';
+    }
+    if(p.zi3!==undefined&&p.zi3!==null){
+      var h3el=GE[p.zi3]||'水';
+      hStems+='<tspan fill="'+c[h3el]+'">·'+TG[p.zi3]+'</tspan>';
+    }
+    var labelBg=isDay?'rgba(192,64,48,0.12)':'rgba(42,36,32,0.06)';
+    var labelColor=isDay?'#c04030':'#6b6058';
+    pillarCells+=
+      '<div style="flex:1;background:'+row.bg+';border-radius:12px;padding:14px 8px;text-align:center;position:relative;border:1px solid rgba(42,36,32,0.07)">'+
+        '<div style="position:absolute;top:6px;left:8px;font-size:.6rem;letter-spacing:1px;background:'+labelBg+';color:'+labelColor+';padding:2px 6px;border-radius:4px;font-family:LXGW WenKai,serif">'+row.label+'</div>'+
+        '<div style="margin-top:18px">'+
+          '<div style="font-size:2.1rem;font-weight:700;color:'+stemColor+';line-height:1.1" onclick="showTTPillar(this,\''+p.s+'\',\''+p.b+'\',\''+GE[p.gi]+'\')">'+p.s+'</div>'+
+          '<div style="font-size:1.5rem;color:'+branchColor+';line-height:1.1">'+p.b+'</div>'+
+          '<div style="font-size:.65rem;color:#6b6058;margin-top:4px;line-height:1.5">'+
+            '<tspan fill="#4a6a8a">藏</tspan>'+
+            '<tspan fill="'+c[ZE[p.zi]||'#6b6058']+'">'+TG[p.zi]+'</tspan>'+
+            hStems+
+          '</div>'+
+        '</div>'+
+      '</div>';
+  });
+
+  var barArea=
+    '<div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(42,36,32,0.07)">'+
+      '<div style="font-size:.65rem;letter-spacing:2px;color:var(--songyan);text-align:center;margin-bottom:8px">五 行 分 布</div>'+
+      '<div style="display:flex;align-items:flex-end;justify-content:center;height:190px;gap:8px">'+
+        '<svg width="220" height="'+maxH+'" viewBox="0 0 220 '+maxH+'" style="overflow:visible">'+
+          barSVGs+
+        '</svg>'+
+      '</div>'+
+    '</div>';
+
+  return'<div style="display:flex;gap:8px;margin-bottom:0">'+pillarCells+'</div>'+barArea;
+}
+
+function buildShiShenRadarSVG(ss,dayS){
+  // ss = {比肩,劫财,食神,伤官,偏财,正财,七杀,正官,偏印,正印}
+  var deities=Object.keys(ss).filter(function(k){return ss[k]>0;});
+  if(deities.length===0)return'';
+
+  var cx=120,cy=105,r=75;
+  // Map 10 deities to 10 axes (pentagon has 5, we use 10)
+  var axes=[
+    {name:'比肩',v:ss.比肩,angle:0},
+    {name:'正印',v:ss.正印,angle:Math.PI*2/10*1},
+    {name:'七杀',v:ss.七杀,angle:Math.PI*2/10*2},
+    {name:'偏印',v:ss.偏印,angle:Math.PI*2/10*3},
+    {name:'劫财',v:ss.劫财,angle:Math.PI*2/10*4},
+    {name:'正官',v:ss.正官,angle:Math.PI*2/10*5},
+    {name:'偏财',v:ss.偏财,angle:Math.PI*2/10*6},
+    {name:'正财',v:ss.正财,angle:Math.PI*2/10*7},
+    {name:'食神',v:ss.食神,angle:Math.PI*2/10*8},
+    {name:'伤官',v:ss.伤官,angle:Math.PI*2/10*9}
+  ];
+
+  var maxV=Math.max.apply(null,axes.map(function(a){return a.v}))||3;
+  var levels=[0.25,0.5,0.75,1.0];
+  var gridPolygons='';
+  levels.forEach(function(l){
+    var pts=axes.map(function(a){
+      var rr=r*l;
+      return(cos(a.angle)*(cx+rr)+','+(cy+sin(a.angle)*(rr))).slice(0,20);
+    });
+    gridPolygons+='<polygon points="'+pts.join(' ')+'" fill="none" stroke="rgba(42,36,32,0.1)" stroke-width="1"/>';
+  });
+
+  // Axis lines + labels
+  var axisLines='';
+  var labels='';
+  axes.forEach(function(a){
+    var rr=r+18;
+    var lx=cos(a.angle)*(cx+rr)+8;
+    var ly=cy+sin(a.angle)*(rr)+4;
+    axisLines+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+cos(a.angle)*r)+'" y2="'+(cy+sin(a.angle)*r)+'" stroke="rgba(42,36,32,0.15)" stroke-width="1"/>';
+    labels+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" font-size="9.5" fill="#6b6058" font-family="Noto Sans SC">'+a.name+a.v+'</text>';
+  });
+
+  // Data polygon
+  var dataPts=axes.map(function(a){
+    var rr=r*(a.v/maxV);
+    return String(cos(a.angle)*(cx+rr)+','+(cy+sin(a.angle)*rr));
+  });
+  var fillColor='rgba(192,64,48,0.15)';
+  var strokeColor='#c04030';
+  var dataPoly='<polygon points="'+dataPts.join(' ')+'" fill="'+fillColor+'" stroke="'+strokeColor+'" stroke-width="2" stroke-linejoin="round"/>';
+
+  // Data dots
+  var dots='';
+  axes.forEach(function(a){
+    if(a.v===0)return;
+    var rr=r*(a.v/maxV);
+    var dx=cos(a.angle)*(cx+rr);
+    var dy=cy+sin(a.angle)*rr;
+    dots+='<circle cx="'+dx+'" cy="'+dy+'" r="3.5" fill="'+strokeColor+'" stroke="#fff" stroke-width="1.5"/>';
+  });
+
+  // Title
+  var title='<text x="'+cx+'" y="14" text-anchor="middle" font-size="11" fill="#2a2420" font-family="LXGW WenKai,serif" letter-spacing="2">十 神 星 盘</text>';
+
+  // Legend: top 3 deities
+  var sorted=deities.sort(function(a,b){return ss[b]-ss[a]});
+  var legend=sorted.slice(0,3).map(function(k){
+    var pct=Math.round(ss[k]/maxV*100);
+    return'<span style="display:inline-block;margin:2px 4px;font-size:.7rem;padding:2px 8px;background:rgba(192,64,48,0.1);color:#c04030;border-radius:4px">'+k+'×'+ss[k]+'</span>';
+  }).join('');
+
+  return'<div style="text-align:center">'+
+    '<svg width="260" height="240" viewBox="0 0 240 240">'+
+      title+gridPolygons+axisLines+dataPoly+dots+labels+
+    '</svg>'+
+    '<div style="margin-top:8px;font-size:.68rem;color:#6b6058;letter-spacing:1px">优势十神</div>'+
+    '<div style="margin-top:4px">'+legend+'</div>'+
+  '</div>';
+}
+
+function buildDaYunTimelineSVG(dyt,pils,dayS,gender){
+  // dyt = [{step, s, b, startAge, endAge, ...}]
+  if(!dyt||dyt.length===0)return'';
+  var yearColors={木:'#5a7a5a',火:'#c05050',土:'#b8956a',金:'#c8a850',水:'#4a6a8a'};
+  var totalYears=dyt[dyt.length-1].endAge||100;
+  var totalW=Math.max(500,totalYears*4.5);
+
+  var stepW=totalW/dyt.length;
+  var lineY=50;
+  var tracks=[
+    {label:'事业',y:lineY,color:'#c04030'},
+    {label:'财运',y:lineY+36,color:'#c8a850'},
+    {label:'感情',y:lineY+72,color:'#5a7a5a'}
+  ];
+
+  // Track backgrounds
+  var tracksHTML='';
+  tracks.forEach(function(t){
+    tracksHTML+='<line x1="60" y1="'+t.y+'" x2="'+(totalW+60)+'" y2="'+t.y+'" stroke="rgba(42,36,32,0.1)" stroke-width="1" stroke-dasharray="3,3"/>';
+    tracksHTML+='<text x="6" y="'+(t.y+4)+'" text-anchor="start" font-size="9" fill="#6b6058">'+t.label+'</text>';
+  });
+
+  // DaYun blocks
+  var blocks='';
+  dyt.forEach(function(d,i){
+    var x=60+i*stepW;
+    var w=stepW-2;
+    var bgc=yearColors[ZE[d.b]]||'#6b6058';
+    var ageLabel=(d.startAge||0)+'-'+(d.endAge||0)+'岁';
+    var ssName=getShiShen(dayS,d.s)||'';
+    var ssColor={食神:'#c8a850',伤官:'#c05050',比肩:'#5a7a5a',劫财:'#4a6a8a',正印:'#4a6a8a',偏印:'#4a6a8a',正财:'#b8956a',偏财:'#b8956a',正官:'#4a6a8a',七杀:'#c05050'}[ssName]||'#6b6058';
+
+    blocks+=
+      '<rect x="'+x+'" y="'+(lineY-20)+'" width="'+w+'" height="100" rx="6" fill="'+bgc+'" opacity="0.12"/>'+
+      '<rect x="'+x+'" y="'+(lineY-20)+'" width="'+w+'" height="3" rx="1.5" fill="'+bgc+'"/>'+
+      '<text x="'+(x+w/2)+'" y="'+(lineY-22)+'" text-anchor="middle" font-size="9" fill="'+bgc+'" font-weight="600">'+d.s+d.b+'</text>'+
+      '<text x="'+(x+w/2)+'" y="'+(lineY+lineY-25)+'" text-anchor="middle" font-size="8.5" fill="#6b6058">'+ageLabel+'</text>'+
+      '<text x="'+(x+w/2)+'" y="'+(lineY+lineY-10)+'" text-anchor="middle" font-size="8" fill="'+ssColor+'">'+ssName+'</text>';
+  });
+
+  // Age ruler
+  var ruler='';
+  for(var age=0;age<=100;age+=10){
+    var rx=60+age*4.5;
+    ruler+='<line x1="'+rx+'" y1="'+(lineY+lineY+2)+'" x2="'+rx+'" y2="'+(lineY+lineY+8)+'" stroke="#6b6058" stroke-width="1"/>';
+    ruler+='<text x="'+rx+'" y="'+(lineY+lineY+18)+'" text-anchor="middle" font-size="8" fill="#6b6058">'+age+'</text>';
+  }
+
+  var svg=
+    '<div style="overflow-x:auto;padding-bottom:8px;margin:-4px">'+
+      '<svg width="'+Math.max(totalW+80,600)+'" height="130" viewBox="0 0 '+(totalW+80)+' 130">'+
+        tracksHTML+blocks+ruler+
+      '</svg>'+
+    '</div>';
+  return svg;
+}
+
+function buildYiJingWheelSVG(yj){
+  // yj = {guaNum, gua, guaCi, yaoCi, type, huguag, zhiguaName}
+  if(!yj||!yj.guaNum)return'';
+  var cx=110,cy=110,r=80;
+  // Bagua positions (8 trigrams, clockwise from top)
+  var bagua=['乾','兑','离','震','巽','坎','艮','坤'];
+  var baguaColor={'乾':'#c8a850','兑':'#5a7a5a','离':'#c05050','震':'#b8956a','巽':'#5a7a5a','坎':'#4a6a8a','艮':'#b8956a','坤':'#6b6058'};
+
+  // Draw outer ring with bagua
+  var outerRing='';
+  for(var i=0;i<8;i++){
+    var angle=(i*45-90)*Math.PI/180;
+    var lx=cx+cos(angle)*(r+22);
+    var ly=cy+sin(angle)*(r+22);
+    outerRing+='<text x="'+lx+'" y="'+(ly+5)+'" text-anchor="middle" font-size="14" font-weight="700" fill="'+baguaColor[bagua[i]]+'" font-family="LXGW WenKai,serif">'+bagua[i]+'</text>';
+  }
+  outerRing+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+18)+'" fill="none" stroke="rgba(42,36,32,0.15)" stroke-width="1.5"/>';
+
+  // Inner hexagram circle
+  var hexColor=baguaColor[yj.gua]||'#c04030';
+  outerRing+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r-5)+'" fill="rgba(245,240,232,0.9)" stroke="'+hexColor+'" stroke-width="2.5"/>';
+
+  // Hexagram name centered
+  var gx=cx-22;
+  outerRing+='<text x="'+cx+'" y="'+(cy-8)+'" text-anchor="middle" font-size="18" font-weight="700" fill="'+hexColor+'" font-family="LXGW WenKai,serif">'+yj.gua+'</text>';
+  outerRing+='<text x="'+cx+'" y="'+(cy+12)+'" text-anchor="middle" font-size="9" fill="#6b6058">'+yj.guaCi.slice(0,20)+'</text>';
+
+  // Type label
+  var typeColor={'上吉':'#5a7a5a','中吉':'#b8956a','下吉':'#4a6a8a','上凶':'#c04030','中凶':'#c05050','下凶':'#b8956a','平':'#6b6058'}[yj.type]||'#6b6058';
+  outerRing+='<text x="'+cx+'" y="'+(cy+26)+'" text-anchor="middle" font-size="9" fill="'+typeColor+'">'+yj.type+'</text>';
+
+  // 互卦 and 之卦 small labels
+  if(yj.huguag){
+    outerRing+='<text x="30" y="18" font-size="9" fill="#6b6058">互</text>';
+    outerRing+='<text x="30" y="30" font-size="10" fill="#4a6a8a" font-family="LXGW WenKai">'+yj.huguag+'</text>';
+  }
+  if(yj.zhiguaName){
+    outerRing+='<text x="'+(cx*2-10)+'" y="18" font-size="9" fill="#6b6058">变</text>';
+    outerRing+='<text x="'+(cx*2-10)+'" y="30" font-size="10" fill="#c05050" font-family="LXGW WenKai">'+yj.zhiguaName+'</text>';
+  }
+
+  var svg=
+    '<div style="text-align:center">'+
+      '<div style="font-size:.65rem;letter-spacing:2px;color:#6b6058;margin-bottom:8px">易 经 卦 象</div>'+
+      '<svg width="220" height="220" viewBox="0 0 220 220" style="display:block;margin:0 auto">'+
+        outerRing+
+      '</svg>'+
+    '</div>';
+  return svg;
+}
+
+// Helper math
+function cos(a){return Math.cos(a);}
+function sin(a){return Math.sin(a);}
+
 </script>
 
 
