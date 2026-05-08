@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>命理通 — 视觉预览</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f5f0e8;font-family:'Noto Sans SC',sans-serif;color:#2a2420;padding:20px}
+  .preview-section{margin-bottom:48px}
+  h2{font-size:.75rem;letter-spacing:3px;color:#9a8a7a;text-transform:uppercase;margin-bottom:16px;border-bottom:1px solid rgba(42,36,32,.1);padding-bottom:8px}
+  h3{font-size:.85rem;color:#6b6058;margin:24px 0 8px;font-weight:400;letter-spacing:1px}
+
+  /* Ink card base */
+  .card{
+    background:#faf7f2;
+    border:1px solid rgba(42,36,32,.08);
+    border-radius:16px;
+    padding:28px 32px;
+    box-shadow:0 2px 12px rgba(42,36,32,.06);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,transparent,#c04030,transparent);
+    opacity:.4;
+  }
+
+  /* Four Pillars — Bamboo Scroll Design */
+  .pillars-container{display:flex;gap:12px;align-items:stretch}
+  .pillar-col{
+    flex:1;
+    background:#faf7f2;
+    border:1px solid rgba(42,36,32,.08);
+    border-radius:12px;
+    padding:16px 10px 14px;
+    text-align:center;
+    position:relative;
+    transition:transform .2s,box-shadow .2s;
+  }
+  .pillar-col:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(42,36,32,.1)}
+  .pillar-col.is-day{border-color:rgba(192,64,48,.25);background:linear-gradient(180deg,rgba(192,64,48,.05),transparent)}
+  .pillar-col.is-day::before{content:'日主';position:absolute;top:6px;right:8px;font-size:.55rem;background:rgba(192,64,48,.12);color:#c04030;padding:2px 5px;border-radius:4px;letter-spacing:1px}
+  .pillar-label{
+    font-size:.6rem;letter-spacing:2px;color:#9a8a7a;
+    margin-bottom:10px;text-transform:uppercase;
+  }
+  .pillar-stem{
+    font-size:2.4rem;font-weight:700;line-height:1;
+    font-family:'Noto Serif SC','LXGW WenKai',serif;
+    margin-bottom:2px;
+  }
+  .pillar-branch{
+    font-size:1.5rem;font-weight:500;line-height:1;
+    margin-bottom:6px;
+    font-family:'Noto Serif SC','LXGW WenKai',serif;
+  }
+  .pillar-hidden{
+    font-size:.65rem;color:#9a8a7a;line-height:1.5;
+    margin-top:4px;
+  }
+  .pillar-hidden span{margin:0 1px}
+
+  /* Five Elements — Ink Wash Bars */
+  .elements-row{display:flex;gap:10px;align-items:flex-end;height:90px;margin-top:20px}
+  .el-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .el-bar-track{
+    width:100%;height:64px;
+    background:rgba(42,36,32,.04);
+    border-radius:8px 8px 4px 4px;
+    position:relative;overflow:hidden;
+    display:flex;align-items:flex-end;
+  }
+  .el-bar-fill{
+    width:100%;
+    border-radius:8px 8px 4px 4px;
+    transition:height .6s cubic-bezier(.4,0,.2,1);
+    position:relative;
+  }
+  .el-bar-fill::after{
+    content:'';
+    position:absolute;top:0;left:0;right:0;
+    height:40%;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),transparent);
+    border-radius:inherit;
+  }
+  .el-label{font-size:.7rem;font-weight:500}
+  .el-count{font-size:.6rem;color:#9a8a7a}
+
+  /* Ten Gods Mind Map */
+  .mindmap-wrap{display:flex;justify-content:center;padding:10px 0}
+  .mindmap-center{
+    position:relative;
+    display:inline-block;
+    text-align:center;
+  }
+  .mindmap-daymaster{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:#2a2420;
+    color:#f5f0e8;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;font-weight:700;
+    font-family:'Noto Serif SC',serif;
+    margin:0 auto;
+    box-shadow:0 4px 16px rgba(42,36,32,.25);
+    position:relative;z-index:2;
+  }
+  .mindmap-orbit{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    border:1px dashed rgba(42,36,32,.12);
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .mindmap-gods{
+    position:absolute;
+    top:50%;left:50%;
+    display:flex;flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    width:320px;height:320px;
+    transform:translate(-50%,-50%);
+  }
+  .god-node{
+    position:absolute;
+    display:flex;flex-direction:column;align-items:center;
+    gap:2px;
+    transform:translate(-50%,-50%);
+    transition:transform .2s;
+  }
+  .god-node:hover{transform:translate(-50%,-50%) scale(1.1)}
+  .god-dot{
+    width:32px;height:32px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.55rem;color:#fff;
+    font-weight:600;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    cursor:default;
+  }
+  .god-name{font-size:.6rem;color:#6b6058;font-weight:500}
+  .god-count{font-size:.55rem;color:#9a8a7a}
+  .god-line{
+    position:absolute;
+    top:50%;left:50%;
+    height:1px;
+    background:linear-gradient(90deg,rgba(42,36,32,.15),rgba(42,36,32,.3));
+    transform-origin:0 50%;
+    pointer-events:none;
+  }
+
+  /* DaYun Timeline — Mountain River */
+  .dayun-wrap{position:relative;height:100px;margin-top:12px}
+  .dayun-river{
+    position:absolute;
+    top:40px;left:0;right:0;bottom:30px;
+    background:linear-gradient(90deg,
+      rgba(90,122,90,.06) 0%,
+      rgba(192,64,48,.06) 33%,
+      rgba(200,168,80,.06) 66%,
+      rgba(74,106,138,.06) 100%
+    );
+    border-radius:40px;
+    border-top:2px solid rgba(42,36,32,.1);
+    border-bottom:2px solid rgba(42,36,32,.1);
+  }
+  .dayun-curve{
+    position:absolute;
+    top:calc(40px + 10px);
+    left:0;right:0;
+    height:40px;
+    overflow:hidden;
+  }
+  .dayun-curve::before{
+    content:'';
+    position:absolute;
+    top:5px;left:-20px;right:-20px;height:30px;
+    background:linear-gradient(90deg,
+      #5a7a5a 0%, #c05050 25%, #c8a850 50%, #4a6a8a 75%, #5a7a5a 100%
+    );
+    border-radius:30px;
+    opacity:.3;
+    animation:riverFlow 6s ease-in-out infinite alternate;
+  }
+  @keyframes riverFlow{from{transform:scaleX(.97) translateX(1%)}to{transform:scaleX(1) translateX(0)}}
+  .dayun-blocks{
+    display:flex;gap:4px;align-items:flex-end;
+    height:100%;position:relative;z-index:1;
+    padding:0 8px;
+  }
+  .dayun-block{
+    flex:1;min-width:0;
+    display:flex;flex-direction:column;align-items:center;
+    cursor:default;
+  }
+  .dayun-top{
+    display:flex;flex-direction:column;align-items:center;
+    padding-bottom:4px;
+  }
+  .dayun-gz{
+    font-size:.7rem;font-weight:600;
+    font-family:'Noto Serif SC',serif;
+  }
+  .dayun-ss{font-size:.55rem;color:#9a8a7a;margin-top:1px}
+  .dayun-bar{
+    width:100%;
+    border-radius:6px 6px 0 0;
+    transition:height .5s ease;
+    min-height:4px;
+  }
+  .dayun-ages{
+    display:flex;justify-content:space-between;
+    width:100%;margin-top:6px;
+  }
+  .dayun-age{font-size:.55rem;color:#9a8a7a}
+
+  /* I Ching Wheel */
+  .iching-wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+  .iching-main{
+    flex:0 0 180px;
+    text-align:center;
+    background:#faf7f2;
+    border:1px solid rgba(42,36,32,.08);
+    border-radius:16px;
+    padding:20px 16px;
+    position:relative;
+  }
+  .iching-main::before{
+    content:'';
+    position:absolute;top:0;left:0;right:0;
+    height:3px;
+    background:linear-gradient(90deg,#c8a850,#c04030,#4a6a8a);
+    border-radius:16px 16px 0 0;
+    opacity:.5;
+  }
+  .iching-gua{
+    font-size:3.5rem;font-weight:700;
+    font-family:'Noto Serif SC',serif;
+    line-height:1;
+    margin-bottom:4px;
+  }
+  .iching-title{
+    font-size:.8rem;color:#2a2420;
+    font-family:'Noto Serif SC',serif;
+    margin-bottom:8px;
+  }
+  .iching-type{
+    display:inline-block;
+    font-size:.65rem;padding:3px 10px;
+    border-radius:20px;margin-bottom:8px;
+    font-weight:500;
+  }
+  .iching-calling{
+    font-size:.7rem;color:#6b6058;line-height:1.6;
+    text-align:left;margin-top:8px;
+  }
+  .iching-bagua{
+    flex:1;min-width:200px;
+    position:relative;
+  }
+  .bagua-label{font-size:.6rem;letter-spacing:2px;color:#9a8a7a;text-align:center;margin-bottom:12px}
+  .bagua-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  }
+  .bagua-cell{
+    aspect-ratio:1;
+    border-radius:8px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:1px solid rgba(42,36,32,.06);
+    font-size:1.1rem;font-weight:600;
+    font-family:'Noto Serif SC',serif;
+    cursor:default;
+    transition:transform .15s,box-shadow .15s;
+    padding:4px;
+  }
+  .bagua-cell:hover{transform:scale(1.08);box-shadow:0 4px 12px rgba(42,36,32,.12)}
+  .bagua-cell.active{
+    background:linear-gradient(135deg,#2a2420,#3a3430);
+    color:#f5f0e8;
+    border-color:#2a2420;
+    box-shadow:0 4px 16px rgba(42,36,32,.25);
+  }
+  .bagua-cell.guax{font-size:.55rem;color:#9a8a7a;font-weight:400;margin-top:1px}
+
+  /* Section label */
+  .section-label{
+    font-size:.6rem;letter-spacing:3px;color:#9a8a7a;
+    text-transform:uppercase;margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .section-label::before,.section-label::after{
+    content:'';flex:1;height:1px;background:rgba(42,36,32,.08);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ 四柱图 ═══ -->
+<div class="preview-section">
+  <div class="section-label">四 柱 命 盘</div>
+  <div class="card">
+    <div class="pillars-container">
+      <!-- Sample pillars -->
+      <div class="pillar-col">
+        <div class="pillar-label">年 柱</div>
+        <div class="pillar-stem" style="color:#4a6a8a">辛</div>
+        <div class="pillar-branch" style="color:#4a6a8a">酉</div>
+        <div class="pillar-hidden">
+          <span style="color:#4a6a8a">藏</span><span style="color:#4a6a8a">辛</span><span style="color:#b8956a">·戊</span><span style="color:#c05050">·壬</span>
+        </div>
+      </div>
+      <div class="pillar-col">
+        <div class="pillar-label">月 柱</div>
+        <div class="pillar-stem" style="color:#c05050">丁</div>
+        <div class="pillar-branch" style="color:#c05050">酉</div>
+        <div class="pillar-hidden">
+          <span style="color:#c05050">藏</span><span style="color:#c05050">丁</span><span style="color:#4a6a8a">·己</span>
+        </div>
+      </div>
+      <div class="pillar-col is-day">
+        <div class="pillar-label">日 柱</div>
+        <div class="pillar-stem" style="color:#c04030">壬</div>
+        <div class="pillar-branch" style="color:#4a6a8a">午</div>
+        <div class="pillar-hidden">
+          <span style="color:#c05050">藏</span><span style="color:#c05050">丁</span><span style="color:#b8956a">·己</span>
+        </div>
+      </div>
+      <div class="pillar-col">
+        <div class="pillar-label">时 柱</div>
+        <div class="pillar-stem" style="color:#5a7a5a">庚</div>
+        <div class="pillar-branch" style="color:#b8956a">子</div>
+        <div class="pillar-hidden">
+          <span style="color:#b8956a">藏</span><span style="color:#b8956a">庚</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>五行分布</h3>
+    <div class="elements-row">
+      <div class="el-bar-wrap">
+        <div class="el-bar-track">
+          <div class="el-bar-fill" style="height:30%;background:linear-gradient(180deg,#5a7a5a,#4a6a4a)"></div>
+        </div>
+        <div class="el-label" style="color:#5a7a5a">木</div>
+        <div class="el-count">1</div>
+      </div>
+      <div class="el-bar-wrap">
+        <div class="el-bar-track">
+          <div class="el-bar-fill" style="height:60%;background:linear-gradient(180deg,#c05050,#a04040)"></div>
+        </div>
+        <div class="el-label" style="color:#c05050">火</div>
+        <div class="el-count">2</div>
+      </div>
+      <div class="el-bar-wrap">
+        <div class="el-bar-track">
+          <div class="el-bar-fill" style="height:90%;background:linear-gradient(180deg,#b8956a,#96704e)"></div>
+        </div>
+        <div class="el-label" style="color:#b8956a">土</div>
+        <div class="el-count">3</div>
+      </div>
+      <div class="el-bar-wrap">
+        <div class="el-bar-track">
+          <div class="el-bar-fill" style="height:45%;background:linear-gradient(180deg,#c8a850,#a88840)"></div>
+        </div>
+        <div class="el-label" style="color:#c8a850">金</div>
+        <div class="el-count">2</div>
+      </div>
+      <div class="el-bar-wrap">
+        <div class="el-bar-track">
+          <div class="el-bar-fill" style="height:75%;background:linear-gradient(180deg,#4a6a8a,#3a5a7a)"></div>
+        </div>
+        <div class="el-label" style="color:#4a6a8a">水</div>
+        <div class="el-count">3</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 十神星盘 Mind Map ═══ -->
+<div class="preview-section">
+  <div class="section-label">十 神 星 盘</div>
+  <div class="card">
+    <div class="mindmap-wrap">
+      <div class="mindmap-center">
+        <!-- Orbit rings -->
+        <div class="mindmap-orbit" style="width:180px;height:180px"></div>
+        <div class="mindmap-orbit" style="width:260px;height:260px;border-style:dashed;border-width:.5px;opacity:.5"></div>
+        <div class="mindmap-orbit" style="width:340px;height:340px;border-width:.5px;opacity:.3"></div>
+
+        <!-- God nodes at fixed positions -->
+        <div class="mindmap-gods">
+          <!-- Center: Day Master -->
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3">
+            <div class="mindmap-daymaster">壬</div>
+          </div>
+
+          <!-- 10 gods at compass positions -->
+          <!-- 比肩 (top) -->
+          <div class="god-node" style="top:50%;left:50%;transform:translate(-50%,-180px)">
+            <div class="god-dot" style="background:#5a7a5a">比</div>
+            <div class="god-name">比肩</div>
+            <div class="god-count">×1</div>
+          </div>
+          <!-- 劫财 (top-right) -->
+          <div class="god-node" style="top:calc(50% + 127px);left:calc(50% + 127px)">
+            <div class="god-dot" style="background:#4a6a8a">劫</div>
+            <div class="god-name">劫财</div>
+            <div class="god-count">×0</div>
+          </div>
+          <!-- 食神 (right) -->
+          <div class="god-node" style="top:50%;left:calc(50% + 180px)">
+            <div class="god-dot" style="background:#c8a850">食</div>
+            <div class="god-name">食神</div>
+            <div class="god-count">×2</div>
+          </div>
+          <!-- 伤官 (bottom-right) -->
+          <div class="god-node" style="top:calc(50% + 180px);left:calc(50% + 127px)">
+            <div class="god-dot" style="background:#c05050">伤</div>
+            <div class="god-name">伤官</div>
+            <div class="god-count">×0</div>
+          </div>
+          <!-- 偏财 (bottom) -->
+          <div class="god-node" style="top:calc(50% + 180px);left:50%;transform:translate(-50%,0)">
+            <div class="god-dot" style="background:#b8956a">偏</div>
+            <div class="god-name">偏财</div>
+            <div class="god-count">×0</div>
+          </div>
+          <!-- 正财 (bottom-left) -->
+          <div class="god-node" style="top:calc(50% + 180px);left:calc(50% - 127px)">
+            <div class="god-dot" style="background:#b8956a">财</div>
+            <div class="god-name">正财</div>
+            <div class="god-count">×1</div>
+          </div>
+          <!-- 七杀 (left) -->
+          <div class="god-node" style="top:50%;left:calc(50% - 180px)">
+            <div class="god-dot" style="background:#c04030">杀</div>
+            <div class="god-name">七杀</div>
+            <div class="god-count">×0</div>
+          </div>
+          <!-- 正官 (top-left) -->
+          <div class="god-node" style="top:calc(50% - 127px);left:calc(50% - 127px)">
+            <div class="god-dot" style="background:#4a6a8a">官</div>
+            <div class="god-name">正官</div>
+            <div class="god-count">×1</div>
+          </div>
+          <!-- 偏印 (top) same as 比肩 slot used, add between -->
+          <!-- 巳刃 (far right) -->
+          <div class="god-node" style="top:calc(50% - 90px);left:calc(50% + 155px)">
+            <div class="god-dot" style="background:#9a8a7a;opacity:.5">偏</div>
+            <div class="god-name">偏印</div>
+            <div class="god-count">×0</div>
+          </div>
+          <!-- 正印 (far left) -->
+          <div class="god-node" style="top:calc(50% - 90px);left:calc(50% - 155px)">
+            <div class="god-dot" style="background:#4a6a8a">印</div>
+            <div class="god-name">正印</div>
+            <div class="god-count">×1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend strip -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+      <span style="font-size:.65rem;color:#9a8a7a">优势十神：</span>
+      <span style="display:inline-block;font-size:.65rem;padding:3px 10px;background:rgba(200,168,80,.12);color:#b8956a;border-radius:20px">食神 ×2</span>
+      <span style="display:inline-block;font-size:.65rem;padding:3px 10px;background:rgba(90,122,90,.1);color:#5a7a5a;border-radius:20px">比肩 ×1</span>
+      <span style="display:inline-block;font-size:.65rem;padding:3px 10px;background:rgba(74,106,138,.1);color:#4a6a8a;border-radius:20px">正印 ×1</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 大运时间轴 ═══ -->
+<div class="preview-section">
+  <div class="section-label">大 运 流 年</div>
+  <div class="card">
+    <div class="dayun-wrap">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:.65rem;color:#9a8a7a">10岁</span>
+        <span style="font-size:.65rem;color:#9a8a7a">30岁</span>
+        <span style="font-size:.65rem;color:#9a8a7a">50岁</span>
+        <span style="font-size:.65rem;color:#9a8a7a">70岁</span>
+        <span style="font-size:.65rem;color:#9a8a7a">90岁</span>
+      </div>
+      <div class="dayun-river"></div>
+      <div class="dayun-blocks">
+        <div class="dayun-block" style="opacity:.4">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#4a6a8a">癸酉</div><div class="dayun-ss">印</div></div>
+          <div class="dayun-bar" style="height:35%;background:#4a6a8a"></div>
+          <div class="dayun-ages"><span class="dayun-age">0</span><span class="dayun-age">10</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.55">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#5a7a5a">甲戌</div><div class="dayun-ss">比</div></div>
+          <div class="dayun-bar" style="height:50%;background:#5a7a5a"></div>
+          <div class="dayun-ages"><span class="dayun-age">10</span><span class="dayun-age">20</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.7">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#c05050">乙亥</div><div class="dayun-ss">食</div></div>
+          <div class="dayun-bar" style="height:65%;background:#c05050"></div>
+          <div class="dayun-ages"><span class="dayun-age">20</span><span class="dayun-age">30</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.85">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#b8956a">丙子</div><div class="dayun-ss">财</div></div>
+          <div class="dayun-bar" style="height:75%;background:#b8956a"></div>
+          <div class="dayun-ages"><span class="dayun-age">30</span><span class="dayun-age">40</span></div>
+        </div>
+        <div class="dayun-block">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#c04030">丁丑</div><div class="dayun-ss">官</div></div>
+          <div class="dayun-bar" style="height:100%;background:#c04030"></div>
+          <div class="dayun-ages"><span class="dayun-age">40</span><span class="dayun-age">50</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.85">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#c8a850">戊寅</div><div class="dayun-ss">印</div></div>
+          <div class="dayun-bar" style="height:70%;background:#c8a850"></div>
+          <div class="dayun-ages"><span class="dayun-age">50</span><span class="dayun-age">60</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.7">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#4a6a8a">己卯</div><div class="dayun-ss">比</div></div>
+          <div class="dayun-bar" style="height:60%;background:#4a6a8a"></div>
+          <div class="dayun-ages"><span class="dayun-age">60</span><span class="dayun-age">70</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.55">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#5a7a5a">庚辰</div><div class="dayun-ss">劫</div></div>
+          <div class="dayun-bar" style="height:50%;background:#5a7a5a"></div>
+          <div class="dayun-ages"><span class="dayun-age">70</span><span class="dayun-age">80</span></div>
+        </div>
+        <div class="dayun-block" style="opacity:.4">
+          <div class="dayun-top"><div class="dayun-gz" style="color:#b8956a">辛巳</div><div class="dayun-ss">食</div></div>
+          <div class="dayun-bar" style="height:40%;background:#b8956a"></div>
+          <div class="dayun-ages"><span class="dayun-age">80</span><span class="dayun-age">90</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 易经卦盘 ═══ -->
+<div class="preview-section">
+  <div class="section-label">易 经 卦 象</div>
+  <div class="card">
+    <div class="iching-wrap">
+      <div class="iching-main">
+        <div class="iching-gua" style="color:#c04030">晋</div>
+        <div class="iching-title">火地晋 · 上吉</div>
+        <span class="iching-type" style="background:rgba(90,122,90,.1);color:#5a7a5a">上吉</span>
+        <div class="iching-calling">
+          <div style="font-size:.65rem;color:#9a8a7a;margin-bottom:4px">彖曰</div>
+          晋者，进也。明出地上，顺而丽乎大明。
+          柔进而上行，是以康侯用锡马蕃庶。
+        </div>
+        <div style="margin-top:10px;padding:8px;background:rgba(192,64,48,.05);border-radius:8px;border-left:2px solid #c04030">
+          <div style="font-size:.62rem;color:#6b6058;line-height:1.6">策略：<b style="color:#c04030">进</b> — 主动出击，抓住上升期的机会窗口</div>
+        </div>
+      </div>
+      <div class="iching-bagua">
+        <div class="bagua-label">八 宫 卦 象 图</div>
+        <div class="bagua-grid">
+          <div class="bagua-cell" style="background:rgba(200,168,80,.08);color:#c8a850">乾<div class="bagua-cell-guax">天</div></div>
+          <div class="bagua-cell" style="background:rgba(90,122,90,.08);color:#5a7a5a">巽<div class="bagua-cell-guax">风</div></div>
+          <div class="bagua-cell" style="background:rgba(192,64,48,.08);color:#c04030">离<div class="bagua-cell-guax">火</div></div>
+          <div class="bagua-cell" style="background:rgba(184,149,106,.08);color:#b8956a">艮<div class="bagua-cell-guax">山</div></div>
+          <div class="bagua-cell" style="background:rgba(74,106,138,.08);color:#4a6a8a">坎<div class="bagua-cell-guax">水</div></div>
+          <div class="bagua-cell" style="background:rgba(200,80,80,.08);color:#c05050">震<div class="bagua-cell-guax">雷</div></div>
+          <div class="bagua-cell" style="background:rgba(107,96,88,.08);color:#6b6058">坤<div class="bagua-cell-guax">地</div></div>
+          <div class="bagua-cell" style="background:rgba(90,122,90,.08);color:#5a7a5a">兑<div class="bagua-cell-guax">泽</div></div>
+          <div class="bagua-cell active" style="">晋<div class="bagua-cell-guax" style="color:#9a8a7a">火地</div></div>
+          <div class="bagua-cell" style="background:rgba(192,64,48,.06);color:#c04030">大有<div class="bagua-cell-guax">乾互</div></div>
+          <div class="bagua-cell" style="background:rgba(192,64,48,.06);color:#c04030">噬嗑<div class="bagua-cell-guax">火雷</div></div>
+          <div class="bagua-cell" style="background:rgba(200,168,80,.06);color:#c8a850">旅<div class="bagua-cell-guax">火山</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
