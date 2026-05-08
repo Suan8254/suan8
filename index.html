@@ -479,7 +479,7 @@ function getLunarMonth(sm,sd){for(var i=10;i>=0;i--){var j=JIE[i];if(sm>j.m||(sm
 function yearP(y,sm,sd){var ey=y;if(sm<2||(sm===2&&sd<4))ey--;return{s:TG[((ey-4)%10+10)%10],b:DZ[((ey-4)%12+12)%12],gi:((ey-4)%10+10)%10,zi:((ey-4)%12+12)%12};}
 function monthP(yg,l){var z=(l+1)%12;return{s:TG[([2,4,6,8,0][yg%5]+l-1)%10],b:DZ[z],gi:([2,4,6,8,0][yg%5]+l-1)%10,zi:z};}
 function dayP(y,m,d){var delta=Math.floor((Date.UTC(y,m-1,d)-Date.UTC(1900,0,1))/86400000),idx=((10+delta)%60+60)%60;return{s:TG[idx%10],b:DZ[idx%12],gi:idx%10,zi:idx%12};}
-function hourP(dgi,hi){return{s:TG[([0,2,4,6,8][dgi%5]+hi)%10],b:DZ[hi],gi:([0,2,4,6,8][dgi%5]+hi)%10,zi:hi};}
+function hourP(dgi,hi){var tgIdx=([0,2,4,6,8][dgi%5]+hi)%10;var bName=DZ[hi];var hidden=ZCG[bName]||[];return{s:TG[tgIdx],b:bName,gi:tgIdx,zi:hi,zi2:hidden[0]!==undefined?hidden[0]:null,zi3:hidden[1]!==undefined?hidden[1]:null};}
 function countEl(ps){var c={木:0,火:0,土:0,金:0,水:0};ps.forEach(function(p){c[GE[p.gi]]++;c[ZE[p.zi]]++});return c;}
 function dmStrength(dgi,pils){var dEl=GE[dgi];var mpB=pils[1].b,dpB=pils[2].b,hpB=pils[3].b;var mBEl=ZE[mpB],mScore=0;if(mBEl===dEl)mScore=2.0;else if(SHENG[mBEl]===dEl)mScore=1.5;else if(BEI_KE[mBEl]===dEl)mScore=0.4;else mScore=1.0;function rv(bi){var r=ZCG[bi]||[];if(!r)return 0;if(r[0]&&GE[r[0]]===dEl)return 1.0;if(r[1]&&GE[r[1]]===dEl)return 0.6;if(r[2]&&GE[r[2]]===dEl)return 0.3;return 0;}var rootScore=rv(dpB)*0.8+rv(hpB)*0.2;var sc=0;[pils[0].s,pils[1].s,pils[3].s].forEach(function(s){if(GE[s]===dEl)sc++;});var stemScore=Math.min(sc*0.5,1.0);var hc=0;pils.forEach(function(p){(ZCG[p.b]||[]).forEach(function(g){if(GE[g]===dEl)hc++;});});var hiddenScore=Math.min(hc*0.25,0.75);var total=mScore*0.40+rootScore*0.25+stemScore*0.20+hiddenScore*0.15;if(total>=1.80)return'极旺';if(total>=1.35)return'偏旺';if(total>=0.90)return'中和';if(total>=0.60)return'偏弱';return'极弱';}
 function countShiShen(dayS,pils){var ss={比肩:0,劫财:0,食神:0,伤官:0,偏财:0,正财:0,七杀:0,正官:0,偏印:0,正印:0};pils.forEach(function(p,i){if(i===2)return;ss[getShiShen(dayS,p.s)]++;var cg=ZCG[p.b];if(cg)cg.forEach(function(g){ss[getShiShen(dayS,g)]++});});return ss;}
@@ -638,7 +638,7 @@ function buildHealthReading(dayS,el,str){
     
       if(notes.length===0||notes.length===1)notes=['五行较平衡，没有明显的先天短板。但这不意味着可以挥霍身体——平衡是动态的，长期熬夜、压力过大，任何人都会失衡。保持规律作息和适度运动，是维持这种平衡最朴素的方式。'];
   var healthIndex=100-weak.length*10-(el.木>=4?10:0)-(el.火>=4?10:0);
-  return{weak:weak,healthIndex:healthIndex,notes:notes};
+  return{weak:weak,healthIndex:healthIndex,notes:notes,desc:notes[0]||'—',suggestion:notes[1]||notes[0]||'—',suggestions:notes.slice(1)};
 }
 
 // ══ YIJING DIVINATION (64 hexagrams) ══
@@ -679,7 +679,7 @@ function getYiJingHexagram(question){
     '慎':question+'之事，需谨慎行事，三思而后行，防小人在侧，宜稳不宜急。',
     '走':question+'之事，不利久留，考虑撤退或转移方向，避开不利因素。'
   };
-  var changing=[];for(var ci2=0;ci2<6;ci2++){var seed2=(h*1007+ci2*31)>>>0;if((seed2%9973)>4986)changing.push(ci2);}var zgBits=yao.slice();changing.forEach(function(ci){zgBits[ci]=zgBits[ci]===1?0:1;});var zgNum=zgBits[0]*32+zgBits[1]*16+zgBits[2]*8+zgBits[3]*4+zgBits[4]*2+zgBits[5];var zgd=guaData[zgNum+1]||guaData[1];var yaoInfo=yao.map(function(y,i){var labels=['初九','六二','九三','六四','九五','上九'];var changed=changing.indexOf(i)!==-1;return labels[i]+'：'+(y===1?'阳':'阴')+(changed?' 【动】':'');});return{guaNum:guaNum+1,name:gd.name,guaCi:gd.ci,img:gd.img,yaoCi:yaoInfo,oracle:oracle[gd.strat]||oracle['观'],type:gd.type,strategy:gd.strat,strategyNote:gd.ov,huguagName:hg.name,huguagIntro:huIntro,huguagCi:hg.ci,huguagImg:hg.img,zhiguaName:zgd.name,zhiguaCi:zgd.ci,zhiguaImg:zgd.img,changing:changing,zhiguaNum:zgNum+1};
+  var changing=[];for(var ci2=0;ci2<6;ci2++){var seed2=(h*1007+ci2*31)>>>0;if((seed2%9973)>4986)changing.push(ci2);}var zgBits=yao.slice();changing.forEach(function(ci){zgBits[ci]=zgBits[ci]===1?0:1;});var zgNum=zgBits[0]*32+zgBits[1]*16+zgBits[2]*8+zgBits[3]*4+zgBits[4]*2+zgBits[5];var zgd=guaData[zgNum+1]||guaData[1];var yaoInfo=yao.map(function(y,i){var labels=['初九','六二','九三','六四','九五','上九'];var changed=changing.indexOf(i)!==-1;return labels[i]+'：'+(y===1?'阳':'阴')+(changed?' 【动】':'');});return{guaNum:guaNum+1,gua:gd.name,name:gd.name,guaCi:gd.ci,img:gd.img,yaoCi:yaoInfo,oracle:oracle[gd.strat]||oracle['观'],type:gd.type,strategy:gd.strat,strategyNote:gd.ov,huguag:hg.name,huguagName:hg.name,huguagIntro:huIntro,huguagCi:hg.ci,huguagImg:hg.img,zhiguaName:zgd.name,zhiguaCi:zgd.ci,zhiguaImg:zgd.img,changing:changing,zhiguaNum:zgNum+1};
 }
 
 // ══ LIU REN (小六壬) ══
@@ -691,7 +691,11 @@ function getLiuRen(month,day,hour){
   var meanings={'大安':{mean:'身不动时，大安。万事求安，行事顺利，无风险。',advice:'诸事平稳，宜守成，不宜冒险激进。',good:'求财、谈判、签约、远行均吉。',bad:'大安本身平和，但过于安稳可能错失机会。'},'留连':{mean:'人未归时，留连。运势滞涩不进，暧昧不明。',advice:'时机未到，不宜强求，需耐心等待。感情有暗昧不明之事。',good:'感情暧昧期有利，宜观察。',bad:'财运受阻，不宜投资，防小人纠缠。'},'赤口':{mean:'官事凶，赤口。官非争执，口舌是非，意外伤灾。',advice:'防口舌官非，不宜与人口角，少说话多做事。',good:'对小人而言赤口有利，对好人则凶。',bad:'防意外金属伤害，防火光之灾。'},'小吉':{mean:'人来喜，小吉。人縁和合，所求顺遂，办事通达。',advice:'万事吉兆，人缘好，办事顺，宜社交、婚嫁、求职。',good:'利人际交往，利合作，利表白求婚。',bad:'小吉之后易有回落，宜趁势而上。'},'空亡':{mean:'虚无何也，空亡。谋事成空，劳而无功，一无所获。',advice:'不宜新开始的项目，不宜投资，不宜远行。',good:'空亡之后必有实，利反思总结。',bad:'防破财，防上当，防签空头合同。'},'速喜':{mean:'喜即至，速喜。喜事临门，消息速来，办事速成。',advice:'好消息即将来临，宜把握时机，主动出击。',good:'利远行来信，利搬迁，利考试，利表白成功。',bad:'速喜来得快也去得快，宜抓紧行动。'}};
   var pos=positions[(mIdx+dIdx+lh)%6]||positions[0];
   var m=meanings[pos];
-  return{position:pos,mean:m.mean,advice:m.advice,good:m.good,bad:m.bad};
+  // 命宫 = month position (六神宫位)
+  var mingGong=positions[(mIdx+dIdx)%6]||positions[0];
+  // 身宫 = day+time position
+  var shenGong=positions[(dIdx+lh)%6]||positions[0];
+  return{position:pos,mean:m.mean,advice:m.advice,good:m.good,bad:m.bad,mingGong:mingGong,shenGong:shenGong};
 }
 
 // ══ MEIHUA YISHU (梅花易数 simplified) ══
