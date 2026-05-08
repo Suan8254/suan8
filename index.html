@@ -589,20 +589,9 @@ function buildMarriageReading(dayS,monthSS,pils,el,str,ssCount,ln){
   return{spouseStem:spouseStem,marriageAge:marriageAge,notes:notes};
 }
 
-    sha.push({name:'红鸾',type:'吉',desc:'主婚姻、喜庆，桃花星的一种，感情姻缘之星'});
-    sha.push({name:'天喜',type:'吉',desc:'与红鸾相配，主吉庆、嫁娶、添丁之喜'});
-    sha.push({name:'陀罗',type:'凶',desc:'主波折、阻碍、意外困扰，随运而行，不离不散'});
-    sha.push({name:'铃星',type:'凶',desc:'主突发性冲突、意外伤害，暗藏风险，宜守不宜攻'});
-    
-    sha.push({name:'地空',type:'凶',desc:'主落空、破财、创意受阻，从事创意行业者需特别注意'});
-    sha.push({name:'地劫',type:'凶',desc:'主突发性破耗、财务波折，常伴随意外支出'});
-    sha.push({name:'天哭',type:'凶',desc:'主悲伤、忧虑、情绪低落，宜注意心理健康'});
-    sha.push({name:'天虚',type:'凶',desc:'主空虚无实感，容易自我怀疑，需防止精神内耗'});
-    sha.push({name:'寡宿',type:'凶',desc:'主孤独、寡居倾向，感情上容易落单或被疏远'});
-    sha.push({name:'孤辰',type:'凶',desc:'主独立、不合群，社交关系浅而难深入'});
+
     // ══ CAREER / WEALTH READING ══
 function buildCareerReading(dayS,monthSS,el,str,ssCount,_pils){var pils=(_pils&&_pils[1])?_pils:null;
-  var pils=arguments[5]||null;
   // Month-branch strength: how 月令 affects career trajectory
   var mBEl=ZE[pils[1].b];
   var mBMod=mBEl==='木'?1.3:mBEl==='火'?1.2:mBEl==='土'?1.1:mBEl==='金'?0.9:mBEl==='水'?0.85:1.0;
@@ -631,7 +620,7 @@ function buildCareerReading(dayS,monthSS,el,str,ssCount,_pils){var pils=(_pils&&
   var aptIndex=ssCount.正官+ssCount.七杀>=2?85:ssCount.食神+ssCount.伤官>=2?80:70;
   notes.push(wEl,wSS);
   if(str==='旺')notes.push('身旺之人骨子里有一种"我能行"的自信，这是你在职场里最大的武器。但也要警惕：强势不等于正确，多听不同的声音，能帮你避开不少本可避免的坑。');
-  else if(str==='中和乌中和乌中和')notes.push('中和之命有一种难得的平衡感——既不自大也不自卑，这是职场人际关系中很珍贵的素质。保持这种平衡，就是你最好的策略。');
+  else if(str==='中和'){notes.push('中和之命有一种难得的平衡感——既不自大也不自卑，这是职场人际关系中很珍贵的素质。保持这种平衡，就是你最好的策略。');}
   else notes.push('身弱之人往往更有亲和力，也更懂得借力。这是优势，但要注意：借力不是依赖，最终还是要有自己的核心竞争力，才是真正的铁饭碗。');
   return{apt:apt.slice(0,6),aptIndex:aptIndex,wealthIndex:wealthIndex,notes:notes};
 }
@@ -961,8 +950,6 @@ function go(){
       document.getElementById('ysg').innerHTML='<div class="ys-item ming"><div class="ys-label">命 宫</div><div class="ys-value" style="color:var(--jin)">'+mg+'</div></div><div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+(ys&&ys.xi?ys.xi.join(' · '):'—')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+(ys&&ys.ji?ys.ji.join(' · '):'—')+'</div></div><div class="ys-item yi-note"><div class="ys-label">命理解读</div><div class="ys-value" style="font-size:.78rem;color:var(--songyan);line-height:1.6">'+(ys&&ys.explanation?ys.explanation:'—')+'</div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
       document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
-      var curYear=new Date().getFullYear();
-      var mg=getMingGong(hp.b),ty=getTaiYuan(yp,mp),sg=getShenGong(hp),ln=getLiuNian(curYear,dayS);
       document.getElementById('dyt').insertAdjacentHTML('beforebegin','<div style="margin:8px 0 4px;text-align:center;font-size:.72rem;color:var(--songyan);letter-spacing:1px">胎元 '+ty+'  ·  身宫 '+sg+'</div>');
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
