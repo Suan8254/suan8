@@ -419,7 +419,10 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
   <div class="section fade-in s9"><div class="section-title">小 六 壬 · 占 卜</div><div class="lr-input-row"><select id="lr-month"><option value="">月</option><option value="1">正月</option><option value="2">二月</option><option value="3">三月</option><option value="4">四月</option><option value="5">五月</option><option value="6">六月</option><option value="7">七月</option><option value="8">八月</option><option value="9">九月</option><option value="10">十月</option><option value="11">冬月</option><option value="12">腊月</option></select><select id="lr-day"><option value="">日</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option></select><select id="lr-hour"><option value="">时辰</option><option value="0">子 (23-01)</option><option value="1">丑 (01-03)</option><option value="2">寅 (03-05)</option><option value="3">卯 (05-07)</option><option value="4">辰 (07-09)</option><option value="5">巳 (09-11)</option><option value="6">午 (11-13)</option><option value="7">未 (13-15)</option><option value="8">申 (15-17)</option><option value="9">酉 (17-19)</option><option value="10">戌 (19-21)</option><option value="11">亥 (21-23)</option></select></div><div id="liuren-result" style="text-align:center"><div style="padding:12px;color:var(--songyan);font-size:.85rem">输入日期后点击下方按钮</div></div><button class="submit-btn" style="margin-top:12px;background:var(--zhusha);font-size:.88rem;letter-spacing:2px" onclick="doLiuRen()">重新占卜</button></div>
 
   <!-- 9f. YiJing -->
-  <div class="section fade-in s9"><div class="section-title">易 经 占 卜</div><div class="yj-box"><input type="text" id="yijing-question" placeholder="心中默念问题，然后点击起卦" class="yj-input"><button class="submit-btn" style="background:var(--mo);font-size:.88rem" onclick="doYiJing()">🧘 起 卦</button><div id="yijing-result" style="margin-top:16px"></div></div></div>
+  <div class="section fade-in s9"><div class="section-title">易 经 占 卜</div><div class="yj-box"><input type="text" id="yijing-question" placeholder="心中默念问题，然后点击起卦" class="yj-input"><button class="submit-btn" style="background:var(--mo);font-size:.88rem" onclick="doYiJing()">🧘 起 卦</button><div id="yijing-result" style="margin-top:16px"></div></div>
+  <!-- 9e. ZiWei -->
+  <div class="section fade-in s9"><div class="section-title">紫 微 斗 数</div><div class="section-label">命宫 · 星曜 · 大运</div><div id="ziwei-result" style="text-align:center"><div style="padding:16px;color:var(--songyan);font-size:.85rem">点击加载紫微斗数完整命盘</div></div><button class="submit-btn" style="margin-top:8px;background:var(--mo);font-size:.88rem" onclick="doZiWei()">星 曜 命 盘</button></div>
+</div>
 
   <!-- 10. Detailed Readings -->
   <div class="section fade-in s9"><div class="section-title">命 理 详 断</div><div class="reading-grid" id="rdg"></div></div>
@@ -1405,6 +1408,398 @@ function buildYiJingWheelSVG(yj){
     leftPanel+rightPanel+
   '</div>';
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+//  紫微斗数 (ZiWei DouShu) — Complete Engine
+//  Systems: 北斗主星, 南斗主星, 中天主星, 辅星, 煞星, 大限, 小限
+// ═══════════════════════════════════════════════════════════════
+
+var ZW_TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var ZW_DZ=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var ZW_DZ_IDX={子:0,丑:1,寅:2,卯:3,辰:4,巳:5,午:6,未:7,申:8,酉:9,戌:10,亥:11};
+var PALACE_NAMES=['命','兄','夫','子','财','疾','迁','友','事','田','父','福'];
+
+var ZW_STARS={
+  紫微星:{type:'main',group:'北斗',element:'土',desc:'帝星，百神之尊，象征最高领导力与尊贵'},
+  天枢星:{type:'main',group:'北斗',element:'金',desc:'北斗一，辅助紫微，主决策与智慧'},
+  天机星:{type:'main',group:'北斗',element:'水',desc:'北斗三，智慧之星，主思虑、计划、技艺'},
+  天同星:{type:'main',group:'北斗',element:'水',desc:'北斗四，福德之星，主享受、人缘、温和'},
+  文昌星:{type:'main',group:'北斗',element:'金',desc:'北斗五，学术之星，主考试、文学、功名'},
+  廉贞星:{type:'main',group:'北斗',element:'火',desc:'北斗六，囚星，主感情、桃花、执念'},
+  武曲星:{type:'main',group:'北斗',element:'金',desc:'北斗七，财星，主果断、刚毅、理财'},
+  破军星:{type:'main',group:'北斗',element:'水',desc:'北斗八，破坏王，主开创、变动、消耗'},
+  天府星:{type:'main',group:'南斗',element:'火',desc:'南斗一，理财星，主储藏、保守、领导'},
+  太阴星:{type:'main',group:'南斗',element:'水',desc:'南斗二，母亲星/财星，主温柔、阴柔、财富'},
+  贪狼星:{type:'main',group:'南斗',element:'木',desc:'南斗三，桃花星，主欲望、社交、野心'},
+  巨门星:{type:'main',group:'南斗',element:'土',desc:'南斗四，口舌星，主表达、秘密、阴暗'},
+  天相星:{type:'main',group:'南斗',element:'水',desc:'南斗五，印星，主服务、文书、佐臣'},
+  天梁星:{type:'main',group:'南斗',element:'土',desc:'南斗六，荫星，主庇佑、长寿、逢凶化吉'},
+  七杀星:{type:'main',group:'南斗',element:'火',desc:'南斗七，将星，主肃杀、权威、冲动'},
+  太阳星:{type:'main',group:'中天',element:'火',desc:'太阳，普照之星，主权贵、事业、名声、父亲'},
+  左辅星:{type:'aux',group:'辅曜',element:'土',desc:'紫微左辅，增强紫微力量，主助力、跟随'},
+  右弼星:{type:'aux',group:'辅曜',element:'水',desc:'紫微右弼，增强紫微力量，主协调、辅助'},
+  天魁星:{type:'aux',group:'六吉',element:'火',desc:'白天贵神，主科甲、功名、考试、机会'},
+  天钺星:{type:'aux',group:'六吉',element:'火',desc:'夜晚贵神，主科甲、功名、贵人提携'},
+  禄存星:{type:'aux',group:'禄星',element:'土',desc:'财禄星，主财禄、积储、稳定收入'},
+  天马星:{type:'aux',group:'马星',element:'火',desc:'驿马星，主走动、迁移、出差、变动'},
+  地空星:{type:'aux',group:'空曜',element:'火',desc:'天空星，主空幻、变动、创意、不稳定'},
+  地劫星:{type:'aux',group:'空曜',element:'火',desc:'劫财星，主破耗、财来财去、风险'},
+  文曲星:{type:'aux',group:'文昌',element:'水',desc:'文曲星，才艺星，主文艺、口才、特殊才华'},
+  火星:{type:'sha',group:'火铃',element:'火',desc:'火煞，主冲动、急性子、火灾、意外'},
+  铃星:{type:'sha',group:'火铃',element:'火',desc:'铃煞，主暗藏火气、小人、阴私'},
+  陀罗星:{type:'sha',group:'金陀',element:'金',desc:'陀罗星，主拖延、阻碍、固执、纠结'},
+  擎羊星:{type:'sha',group:'金陀',element:'金',desc:'擎羊星，主冲突、破败、冲动、手术'},
+  天空星:{type:'sha',group:'空曜',element:'火',desc:'天空星，主破灭、幻想、创新、两极化'}
+};
+
+var PALACE_READINGS={
+  命:{text:'命宫是整个命盘的核心，代表命主的本质性格、人生主轴和外在给世界的第一印象。命宫强则自我意识强、有主见；命宫弱则依赖性较强、容易随波逐流。命宫也是与父亲、自身健康最有关系的宫位。'},
+  兄:{text:'兄弟宫代表与兄弟姐妹的关系，以及青年时期的人脉网络、同辈圈子。星曜揭示你是否有兄弟姐妹助力、朋友圈的质量、以及你在团队中通常扮演什么角色。'},
+  夫:{text:'夫妻宫是感情与深层情感模式的核心。这里揭示你吸引什么样的伴侣、感情中最大的课题、以及婚姻的早晚与质量。星曜组合好则婚姻和谐、伴侣助力；组合差则感情波折或晚婚明显。'},
+  子:{text:'子女宫代表与子女的关系，以及你的创造力、业余爱好、生育缘分。这里也反映你的娱乐生活、你和孩子相处的方式、以及是否容易有自己的追随者或学生。'},
+  财:{text:'财帛宫显示你与金钱的关系模式、你适合的赚钱方式、以及理财风格。天府、武曲临财帛宫表示有理财能力；破军、贪狼临则财来财去波动较大。'},
+  疾:{text:'疾厄宫代表先天的健康弱点和容易发生的疾病类型。这一宫位可以提前预警你应该特别注意的身体部位，以便日常保养。平时多关注疾厄宫所示的方向，是很好的预防养生方式。'},
+  迁:{text:'迁移宫代表你在外面的际遇、旅途运势、贵人出现的位置、以及人生的外部运势走向。临吉星则常有外出发展的好运；临凶星则需特别注意外出安全。'},
+  友:{text:'交友宫代表你与朋友、下属、合伙人的关系，也反映你的社会资源和人脉质量。临吉星则常有贵人相助；临凶星则小人是非较多。'},
+  事:{text:'事业宫（官禄宫）是紫微斗数最重要的宫位之一，显示你的事业方向、职场运势、权力欲望和成就高度。紫微、天府临事业宫表示有领导力；七杀、破军临则适合开创性工作。'},
+  田:{text:'田宅宫代表固定资产（房产、土地）、家庭氛围、以及你对"家"的感受。临天府、天相表示有不动产的缘分和储财能力；临破军则房产运势波动较大。'},
+  父:{text:'父母宫代表与父母的关系、遗传特质、以及学业运势。在紫微斗数中，父母宫也与文书、学历、考试运有关联。临文昌、文曲表示学业运好；临煞星则父母缘分较浅。'},
+  福:{text:'福德宫代表一个人先天的福气余额、精神生活的质量、以及人生是否过得幸福自在。福德宫临吉星表示天生福气好，即使运程低迷也有精神支撑；临凶星则需特别注意心态调节。'}
+};
+
+function zwPalaceIdx(name){for(var i=0;i<PALACE_NAMES.length;i++)if(PALACE_NAMES[i]===name)return i;return-1;}
+
+function buildPalaceRing(){var r=[];for(var i=0;i<12;i++)r.push({palaceName:PALACE_NAMES[i],stars:[],mainStar:null});return r;}
+
+function placeStar(ring,palaceName,starName){
+  var idx=zwPalaceIdx(palaceName);
+  if(idx===-1)return;
+  if(ring[idx].stars.indexOf(starName)===-1)ring[idx].stars.push(starName);
+}
+
+function calcMingGongDz(birthInfo){
+  var yZri=ZW_DZ_IDX[birthInfo.yearBranch];
+  var mZri=ZW_DZ_IDX[birthInfo.monthBranch];
+  var hZri=ZW_DZ_IDX[birthInfo.hourBranch];
+  var result=(yZri+mZri-hZri+12)%12;
+  return ZW_DZ[result];
+}
+
+function calcMingGongBranchIdx(birthInfo){
+  var yZri=ZW_DZ_IDX[birthInfo.yearBranch];
+  var mZri=ZW_DZ_IDX[birthInfo.monthBranch];
+  var hZri=ZW_DZ_IDX[birthInfo.hourBranch];
+  return (yZri+mZri-hZri+12)%12;
+}
+
+function placeRing(ring,mgBranchIdx,targetDzIdx,starName){
+  var ringPos=(targetDzIdx-mgBranchIdx+12)%12;
+  placeStar(ring,PALACE_NAMES[ringPos],starName);
+}
+
+// 北斗主星
+function placeBeiDouStars(ring,birthInfo){
+  var mgIdx=calcMingGongBranchIdx(birthInfo);
+  var yZri=ZW_DZ_IDX[birthInfo.yearBranch];
+  var mZri=ZW_DZ_IDX[birthInfo.monthBranch];
+  var hZri=ZW_DZ_IDX[birthInfo.hourBranch];
+  // 紫微星口诀:(年支+月支+时支)÷12 → 余数
+  var ziWeiMod=(yZri+mZri+hZri)%12;
+  // 天枢: 紫微+1(逆); 天机+2; 天同+3; 文昌+4; 廉贞+5; 武曲+6; 破军+7
+  placeRing(ring,mgIdx,(ziWeiMod+1)%12,'紫微星');
+  placeRing(ring,mgIdx,(ziWeiMod+2)%12,'天枢星');
+  placeRing(ring,mgIdx,(ziWeiMod+3)%12,'天机星');
+  placeRing(ring,mgIdx,(ziWeiMod+4)%12,'天同星');
+  placeRing(ring,mgIdx,(ziWeiMod+5)%12,'文昌星');
+  placeRing(ring,mgIdx,(ziWeiMod+6)%12,'廉贞星');
+  placeRing(ring,mgIdx,(ziWeiMod+7)%12,'武曲星');
+  placeRing(ring,mgIdx,(ziWeiMod+8)%12,'破军星');
+  return ring;
+}
+
+// 南斗主星
+function placeNanDouStars(ring,birthInfo){
+  var mgIdx=calcMingGongBranchIdx(birthInfo);
+  var yZri=ZW_DZ_IDX[birthInfo.yearBranch];
+  var mZri=ZW_DZ_IDX[birthInfo.monthBranch];
+  var hZri=ZW_DZ_IDX[birthInfo.hourBranch];
+  // 天府: 与紫微相冲
+  var ziWeiMod=(yZri+mZri+hZri)%12;
+  var tianFuIdx=(ziWeiMod+6)%12;
+  // 天府顺布: 天府+1=太阴, +2=贪狼, +3=巨门, +4=天相, +5=天梁, +6=七杀
+  placeRing(ring,mgIdx,tianFuIdx,'天府星');
+  placeRing(ring,mgIdx,(tianFuIdx+1)%12,'太阴星');
+  placeRing(ring,mgIdx,(tianFuIdx+2)%12,'贪狼星');
+  placeRing(ring,mgIdx,(tianFuIdx+3)%12,'巨门星');
+  placeRing(ring,mgIdx,(tianFuIdx+4)%12,'天相星');
+  placeRing(ring,mgIdx,(tianFuIdx+5)%12,'天梁星');
+  placeRing(ring,mgIdx,(tianFuIdx+6)%12,'七杀星');
+  return ring;
+}
+
+// 太阳星
+function placeZhongTianStars(ring,birthInfo){
+  var mgIdx=calcMingGongBranchIdx(birthInfo);
+  var hZri=ZW_DZ_IDX[birthInfo.hourBranch];
+  // 太阳星: 子丑→子宫; 寅卯→卯宫; 辰巳→辰宫; 午未→午宫; 申酉→申宫; 戌亥→戌宫
+  var taiYangMap={0:0,1:0,2:3,3:3,4:4,5:4,6:6,7:6,8:8,9:8,10:10,11:10};
+  var taiYangIdx=taiYangMap[hZri]||0;
+  placeRing(ring,mgIdx,taiYangIdx,'太阳星');
+  return ring;
+}
+
+// 辅星煞星
+function placeAuxSha(ring,birthInfo){
+  var mgIdx=calcMingGongBranchIdx(birthInfo);
+  var yZri=ZW_DZ_IDX[birthInfo.yearBranch];
+  var hZri=ZW_DZ_IDX[birthInfo.hourBranch];
+  var dGanIdx=birthInfo.dayGanIdx||0;
+  var dZri=ZW_DZ_IDX[birthInfo.dayBranch]||0;
+
+  // 禄存星: 日干查表
+  var luCunMap={0:1,1:0,2:1,3:9,4:1,5:0,6:1,7:9,8:0,9:9};
+  placeRing(ring,mgIdx,luCunMap[dGanIdx]||0,'禄存星');
+
+  // 天马星: 年支查表
+  var tianMaMap={0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11};
+  placeRing(ring,mgIdx,tianMaMap[yZri]||0,'天马星');
+
+  // 地空/地劫: 年支查表
+  var diKongMap={0:8,1:9,2:10,3:11,4:0,5:1,6:2,7:3,8:4,9:5,10:6,11:7};
+  placeRing(ring,mgIdx,diKongMap[yZri]||0,'地空星');
+  placeRing(ring,mgIdx,(diKongMap[yZri]+6)%12,'地劫星');
+
+  // 陀罗/擎羊: 时支查表
+  var tuoLuoMap={0:7,1:8,2:9,3:10,4:11,5:0,6:1,7:2,8:3,9:4,10:5,11:6};
+  var qingYangMap={0:6,1:7,2:8,3:9,4:10,5:11,6:0,7:1,8:2,9:3,10:4,11:5};
+  placeRing(ring,mgIdx,tuoLuoMap[hZri]||0,'陀罗星');
+  placeRing(ring,mgIdx,qingYangMap[hZri]||0,'擎羊星');
+
+  // 火星/铃星: 年支查表
+  var huoMap={0:6,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11};
+  placeRing(ring,mgIdx,huoMap[yZri]||0,'火星');
+  placeRing(ring,mgIdx,(huoMap[yZri]+1)%12,'铃星');
+
+  // 左辅/右弼: 紫微顺布
+  var ziWeiMod=(ZW_DZ_IDX[birthInfo.yearBranch]+ZW_DZ_IDX[birthInfo.monthBranch]+ZW_DZ_IDX[birthInfo.hourBranch])%12;
+  placeRing(ring,mgIdx,(ziWeiMod+1)%12,'左辅星');
+  placeRing(ring,mgIdx,(ziWeiMod+2)%12,'右弼星');
+
+  // 文曲星: 时支查表
+  var wenQuMap={0:8,1:9,2:10,3:11,4:0,5:1,6:2,7:3,8:4,9:5,10:6,11:7};
+  placeRing(ring,mgIdx,wenQuMap[hZri]||0,'文曲星');
+
+  // 天魁/天钺
+  var kuiMap={0:1,1:0,2:1,3:0,4:1,5:0,6:1,7:0,8:1,9:0};
+  var yueMap={0:11,1:6,2:11,3:6,4:11,5:6,6:11,7:6,8:11,9:6};
+  placeRing(ring,mgIdx,kuiMap[dGanIdx]||1,'天魁星');
+  placeRing(ring,mgIdx,yueMap[dGanIdx]||11,'天钺星');
+
+  return ring;
+}
+
+// 大运
+function calcDaYun(baziPillars,gender){
+  var yGanIdx=baziPillars[0].gi;
+  var yZriIdx=baziPillars[0].zi;
+  var dGanIdx=baziPillars[2].gi;
+  // 阳男阴女顺行, 阴男阳女逆行
+  var isYang=(yGanIdx%2===0);
+  var dir=(isYang&&gender==='男')||(!isYang&&gender==='女')?1:-1;
+  // 起运年龄: 12-年支数=起步宫, 从3岁开始
+  var startAge=3;
+  var dy=[];
+  for(var i=0;i<8;i++){
+    var age=startAge+i*10;
+    var gongIdx=(i*dir+12)%12;
+    if(gongIdx<0)gongIdx+=12;
+    dy.push({step:i+1,startAge:age,endAge:age+9,palaceIdx:gongIdx,palace:PALACE_NAMES[gongIdx]});
+  }
+  return dy;
+}
+
+// 空亡
+function calcKongWang(dayGanIdx,dayZhiIdx){
+  var kwMap={0:2,1:2,2:4,3:4,4:6,5:6,6:8,7:8,8:0,9:0};
+  var kw1=(dayZhiIdx+(kwMap[dayGanIdx]||2))%12;
+  var kw2=(kw1+1)%12;
+  return[ZW_DZ[kw1],ZW_DZ[kw2]];
+}
+
+// 主入口
+function buildZiWeiChart(year,month,day,hour,gender,baziPillars){
+  var yBranch=baziPillars[0].b;
+  var mBranch=baziPillars[1].b;
+  var dBranch=baziPillars[2].b;
+  var hBranch=baziPillars[3].b;
+  var birthInfo={
+    yearBranch:yBranch,monthBranch:mBranch,dayBranch:dBranch,hourBranch:hBranch,
+    dayGanIdx:baziPillars[2].gi,dayBranchIdx:ZW_DZ_IDX[dBranch],
+    yearBranchIdx:ZW_DZ_IDX[yBranch]
+  };
+  var ring=buildPalaceRing();
+  placeBeiDouStars(ring,birthInfo);
+  placeNanDouStars(ring,birthInfo);
+  placeZhongTianStars(ring,birthInfo);
+  placeAuxSha(ring,birthInfo);
+  var mgBranch=calcMingGongDz(birthInfo);
+  var mgIdx=calcMingGongBranchIdx(birthInfo);
+  // 命宫 main star
+  if(ring[0].stars.length>0){
+    ring[0].mainStar=ring[0].stars[0];
+  }
+  var daYun=calcDaYun(baziPillars,gender);
+  var kongWang=calcKongWang(birthInfo.dayGanIdx,birthInfo.dayBranchIdx);
+  return{
+    palaces:ring,
+    mingGongBranch:mgBranch,
+    dayGanIdx:birthInfo.dayGanIdx,
+    dayBranchIdx:birthInfo.dayBranchIdx,
+    yearBranch:yBranch,
+    daYun:daYun,
+    kongWang:kongWang,
+    gender:gender,
+    birthYear:year,
+    mgIdx:mgIdx
+  };
+}
+
+// ══ SVG Ring ══
+function buildZiWeiRingSVG(chart){
+  var cx=300,cy=320,r=240;
+  var svg='<svg viewBox="0 0 600 640" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px;margin:0 auto;display:block">';
+  svg+='<rect width="600" height="640" fill="#f5f0e8" rx="12"/>';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="160" fill="none" stroke="#c8b89a" stroke-width="1" opacity="0.4"/>';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="240" fill="none" stroke="#c8b89a" stroke-width="1" opacity="0.4"/>';
+  // 8 radial lines
+  for(var i=0;i<8;i++){
+    var a=(i*45-90)*Math.PI/180;
+    svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(a))+'" y2="'+(cy+r*Math.sin(a))+'" stroke="#c8b89a" stroke-width="0.8" opacity="0.4"/>';
+  }
+  // Palaces
+  for(var i=0;i<12;i++){
+    var angle=(i*30-90)*Math.PI/180;
+    var px=cx+r*Math.cos(angle);
+    var py=cy+r*Math.sin(angle);
+    var p=chart.palaces[i];
+    var isMing=i===0;
+    var boxW=72,boxH=38+Math.min(p.stars.length,5)*13;
+    var bx=px-boxW/2,by=py-boxH/2;
+    var bg=isMing?'#c04030':(p.stars.length>0?'#ede6da':'#f5f0e8');
+    var fg=isMing?'#fff':'#2a2420';
+    svg+='<rect x="'+bx+'" y="'+by+'" width="'+boxW+'" height="'+boxH+'" fill="'+bg+'" rx="4" stroke="#c8b89a" stroke-width="1"/>';
+    svg+='<text x="'+px+'" y="'+(by+14)+'" text-anchor="middle" font-size="11" font-weight="700" fill="'+fg+'" font-family="LXGW WenKai,serif">'+p.palaceName+'宫</text>';
+    var mainStars=p.stars.filter(function(s){return ZW_STARS[s]&&ZW_STARS[s].type==='main';});
+    var otherStars=p.stars.filter(function(s){return!ZW_STARS[s]||ZW_STARS[s].type!=='main';});
+    var display=(mainStars.concat(otherStars)).slice(0,5);
+    display.forEach(function(st,si){
+      var sy=by+26+si*13;
+      var sc='#6b6058';
+      if(ZW_STARS[st]){
+        if(ZW_STARS[st].type==='main')sc='#c04030';
+        else if(ZW_STARS[st].type==='aux')sc='#5a7a5a';
+        else sc='#8a6030';
+      }
+      svg+='<text x="'+px+'" y="'+sy+'" text-anchor="middle" font-size="9" fill="'+sc+'" font-family="LXGW WenKai,serif">'+st+'</text>';
+    });
+    if(p.stars.length>5){
+      svg+='<text x="'+px+'" y="'+(by+boxH-5)+'" text-anchor="middle" font-size="8" fill="#aaa" font-family="sans-serif">+'+(p.stars.length-5)+'</text>';
+    }
+  }
+  // Center
+  var dElVar={0:'mu',1:'mu',2:'huo',3:'huo',4:'tu',5:'tu',6:'jin',7:'jin',8:'shui',9:'shui'}[chart.dayGanIdx]||'mo';
+  var dElColor={mu:'#5a7a5a',huo:'#c05050',tu:'#b8956a',jin:'#c8a850',shui:'#4a6a8a'}[dElVar]||'#6b6058';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="55" fill="'+dElColor+'" opacity="0.15"/>';
+  svg+='<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" font-size="18" font-weight="700" fill="'+dElColor+'" font-family="LXGW WenKai,serif">'+ZW_TG[chart.dayGanIdx]+ZW_DZ[chart.dayBranchIdx]+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+10)+'" text-anchor="middle" font-size="9" fill="#6b6058" font-family="LXGW WenKai,serif">日主</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+22)+'" text-anchor="middle" font-size="8" fill="#999" font-family="sans-serif">'+chart.mingGongBranch+'宫命</text>';
+  svg+='<text x="300" y="28" text-anchor="middle" font-size="13" font-weight="700" fill="#2a2420" font-family="LXGW WenKai,serif">紫 微 斗 数</text>';
+  svg+='<text x="300" y="44" text-anchor="middle" font-size="9" fill="#999" font-family="sans-serif">'+chart.birthYear+'年 | 命宫:'+chart.mingGongBranch+' | 空亡:'+chart.kongWang[0]+chart.kongWang[1]+'</text>';
+  svg+='</svg>';
+  return svg;
+}
+
+// ══ DaYun Timeline SVG ══
+function buildZiWeiDaYunSVG(chart){
+  var w=Math.max(600,chart.daYun.length*100+40);
+  var svg='<svg viewBox="0 0 '+w+' 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">';
+  svg+='<rect width="'+w+'" height="110" fill="#f5f0e8" rx="8"/>';
+  var y1=55;
+  svg+='<line x1="20" y1="'+y1+'" x2="'+(w-20)+'" y2="'+y1+'" stroke="#c8b89a" stroke-width="2"/>';
+  chart.daYun.forEach(function(d,i){
+    var x=40+i*100;
+    var starsHere=chart.palaces[d.palaceIdx].stars.filter(function(s){return ZW_STARS[s]&&ZW_STARS[s].type==='main';});
+    var bg=d.palaceIdx===0?'#c04030':(starsHere.length>0?'#6b6058':'#c8b89a');
+    svg+='<circle cx="'+x+'" cy="'+y1+'" r="10" fill="'+bg+'" stroke="#f5f0e8" stroke-width="2"/>';
+    svg+='<text x="'+x+'" y="'+(y1+4)+'" text-anchor="middle" font-size="8" fill="white" font-weight="700" font-family="sans-serif">'+(i+1)+'</text>';
+    svg+='<text x="'+x+'" y="'+(y1-16)+'" text-anchor="middle" font-size="10" fill="#2a2420" font-weight="700" font-family="LXGW WenKai,serif">'+d.palace+'宫</text>';
+    svg+='<text x="'+x+'" y="'+(y1+22)+'" text-anchor="middle" font-size="8" fill="#6b6058" font-family="sans-serif">'+d.startAge+'-'+d.endAge+'岁</text>';
+    if(starsHere.length>0){
+      svg+='<text x="'+x+'" y="'+(y1+34)+'" text-anchor="middle" font-size="7" fill="#c04030" font-family="LXGW WenKai,serif">'+starsHere[0]+'</text>';
+    }
+  });
+  svg+='<text x="'+w/2+'" y="16" text-anchor="middle" font-size="11" fill="#2a2420" font-weight="700" font-family="LXGW WenKai,serif">大运十年一步</text>';
+  svg+='</svg>';
+  return svg;
+}
+
+// ══ doZiWei ══
+function doZiWei(){
+  var el=document.getElementById('ziwei-result');
+  if(!el)return;
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--songyan)"><div style="font-size:1.5rem;margin-bottom:8px">加载中...</div><div style="font-size:.85rem">正在计算紫微斗数...</div></div>';
+  setTimeout(function(){
+    try{
+      if(!lastPillars||!lastDayS){
+        el.innerHTML='<div style="padding:16px;text-align:center;color:var(--zhusha)">请先进行八字排盘</div>';
+        return;
+      }
+      var y=parseInt(document.getElementById('by').value)||1990;
+      var chart=buildZiWeiChart(y,1,1,11,gender,lastPillars);
+      var ringSvg=buildZiWeiRingSVG(chart);
+      var daYunSvg=buildZiWeiDaYunSVG(chart);
+      var palaceHtml=chart.palaces.map(function(p,i){
+        var starsHtml=p.stars.map(function(s){
+          var st=ZW_STARS[s];
+          var cls='';
+          if(st&&st.type==='main')cls='background:#c04030;color:#fff';
+          else if(st&&st.type==='aux')cls='background:#5a7a5a;color:#fff';
+          else cls='background:#8a6030;color:#fff';
+          return'<span style="'+cls+';padding:2px 7px;border-radius:3px;font-size:.78rem;margin:2px;display:inline-block">'+s+'</span>';
+        }).join('');
+        var pr=PALACE_READINGS[p.palaceName];
+        var shortText=pr?pr.text.slice(0,100)+'...':'';
+        return'<div style="margin-bottom:14px;padding:14px;background:var(--card);border-radius:10px;border-left:3px solid var(--zhusha)">'+
+          '<div style="font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--zhusha)">'+p.palaceName+'宫</div>'+
+          '<div style="margin-bottom:8px;min-height:28px">'+starsHtml+'</div>'+
+          (shortText?'<div style="font-size:.82rem;line-height:1.7;color:var(--songyan)">'+shortText+'</div>':'')+
+          '</div>';
+      }).join('');
+      el.innerHTML=
+        '<div style="padding:0 0 20px">'+
+          '<div style="text-align:center;margin-bottom:16px">'+
+            '<div style="font-family:LXGW WenKai,serif;font-size:1.3rem;font-weight:700;color:var(--zhusha);letter-spacing:4px">紫 微 斗 数</div>'+
+            '<div style="font-size:.78rem;color:var(--songyan);margin-top:4px">命宫: <b>'+chart.mingGongBranch+'宫</b> · 空亡: <b>'+chart.kongWang.join('/')+'</b> · 性别: <b>'+chart.gender+'</b></div>'+
+          '</div>'+
+          '<div style="margin-bottom:16px">'+ringSvg+'</div>'+
+          '<div style="margin-bottom:16px;padding:12px;background:var(--card);border-radius:10px">'+
+            '<div style="font-size:.78rem;color:var(--mu);letter-spacing:2px;margin-bottom:8px">大运十年一步</div>'+
+            daYunSvg+
+          '</div>'+
+          '<div style="font-size:.78rem;font-weight:700;color:var(--songyan);letter-spacing:2px;margin:12px 0 8px">十二宫星曜详解</div>'+
+          palaceHtml+
+        '</div>';
+    }catch(err){
+      console.error('紫微斗数出错:',err);
+      el.innerHTML='<div style="padding:16px;text-align:center;color:var(--zhusha);font-size:.85rem">计算出错: '+err.message+'</div>';
+    }
+  },300);
+}
+
+// ══ Test ══
+// var chart=buildZiWeiChart(1990,9,10,11,'男',[{s:'庚',b:'午',gi:6,zi:6},{s:'乙',b:'酉',gi:1,zi:9},{s:'壬',b:'寅',gi:8,zi:2},{s:'戊',b:'午',gi:4,zi:6}]);
+// console.log(JSON.stringify(chart,null,2));
 
 </script>
 
