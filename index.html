@@ -437,6 +437,7 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
 
 <script>
 
+
 // ══ NAV ══
 function showPage(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
 
@@ -629,7 +630,7 @@ function buildCareerReading(dayS,monthSS,el,str,ssCount,_pils){var pils=(_pils&&
 function buildHealthReading(dayS,el,str){
   var weak=[];
   var organMap={木:'肝胆、筋骨、神经系统',火:'心脏、小肠、血液、眼睛',土:'脾胃、消化系统、胰腺',金:'肺、大肠、呼吸系统、鼻子',水:'肾脏、膀胱、耳朵、泌尿系统'};
-  var organOpen={木:'你天生肝胆功能偏旺，是那种容易"上火"的体质。肝火旺的人有一个特点：平时看起来没事，但一旦爆发就是急性的。平时多吃绿叶蔬菜、少熬夜，是对肝胆最基本的尊重。',火:'心脏和小肠是你需要多关注的部位。你的体温调节能力有时候不太稳定，容易手脚冰凉或者突然发热。建议养成记录身体状态的习惯，很多大问题都是从小信号开始的。',土:'脾胃是你先天的薄弱环节。你的消化系统比较敏感，饮食不规律时反应特别明显。工作再忙，也要按时吃饭——这一条对你来说不是建议，是医嘱。',金:'肺和大肠是你的敏感区。你比一般人更容易出现呼吸道问题，尤其是换季时期。保持室内空气流通，少吃辛辣油炸，是保护肺气最简单有效的方法。',水:'肾和膀胱是你需要注意的区域。你的身体对温度变化比较敏感，冬天一定要做好保暖尤其是腰部和脚底。建议每晚用热水泡脚，这个习惯对你的体质特别有益。'};
+  var organOpen={木:'你天生肝胆功能偏旺，是那种容易"上火"的体质。肝火旺的人有一个特点：平时看起来没事，但一旦爆发就是急性的。平时多吃绿叶蔬菜、少熬夜，是对肝胆最基本的尊重。',火:'心脏和小肠是你需要多关注的部位。你的体温调节能力有时候不太稳定，容易手脚冰凉或者突然发热。建议养成记录身体状态的习惯，很多大问题都是从小信号开始的。',土:'脾胃是你先天的薄弱环节。你的消化系统比较敏感，饮食不规律时反应特别明显。工作再忙���也要按时吃饭——这一条对你来说不是建议，是医嘱。',金:'肺和大肠是你的敏感区。你比一般人更容易出现呼吸道问题，尤其是换季时期。保持室内空气流通，少吃辛辣油炸，是保护肺气最简单有效的方法。',水:'肾和膀胱是你需要注意的区域。你的身体对温度变化比较敏感，冬天一定要做好保暖尤其是腰部和脚底。建议每晚用热水泡脚，这个习惯对你的体质特别有益。'};
   weak.push(organMap[GE[TG.indexOf(dayS)]]);
   var dayEl=GE[TG.indexOf(dayS)];
   EN.forEach(function(e){if(el[e]===0)weak.push('缺'+e+'（'+organMap[e]+'较弱）');});
@@ -746,7 +747,7 @@ function buildPersonality(dayS,str,ssCount,el,geju){
     比肩:{t:'独立',p:'「一个人也能把事情做成」是你骨子里的信念。重情义，朋友有事不会袖手旁观。但对亲近的人有时太过坚持自己的方式。',c:'创业·合伙·自由职业'},
     劫财:{t:'好胜',p:'你不服输，社交场合里是天然的存在感。竞争能激发斗志，但也容易在输赢上头时冲动决策。',c:'销售·竞技·需要抛头露面的行业'},
     食神:{t:'才艺',p:'你自带让人想靠近的气场——有才华、有品位、活得有质感。艺术、餐饮、生活方式相关领域对你有天然亲和力。',c:'艺术·设计·餐饮·生活方式创业'},
-    伤官:{t:'不羁',p:'你脑子里永远有新的点子，说出来的话经常让人眼前一亮。创意是你最大的武器，但锋芒太露也容易不小心得罪人。',c:'自由职业·创意·自媒体'},
+    伤官:{t:'不羁',p:'你脑子里永远有新的点子，说出来的话经常让人眼前一亮。创意是你最大的武器，但锋���太露也容易不小心得罪人。',c:'自由职业·创意·自媒体'},
     偏财:{t:'人缘',p:'你天生散发让人信任的气场——慷慨、仗义、眼光独到。钱在你手里不是省出来的，是活起来的。',c:'投资·贸易·商业·资源整合'},
     正财:{t:'务实',p:'你是让伴侣和合伙人都安心的类型——稳重、可预期、能守住家业。正是这种稳重让你在别人踩坑时能稳住。',c:'金融·会计·行政管理·家族企业'},
     七杀:{t:'魄力',p:'你不是那种在压力下退缩的人——挑战越大，你反而越兴奋。这种特质让你在别人望而却步的地方能站出来，但杀伐果断不等于冲动决策。',c:'军警·法律·创业·竞争性行业'},
@@ -859,7 +860,7 @@ function doYiJing(){
     html+='<div style="background:rgba(42,36,32,.03);padding:14px;border-radius:10px;text-align:left;font-size:.88rem;line-height:1.75">'+r.oracle+'</div>';
     html+='<div style="margin-top:10px;padding:10px 14px;background:rgba(200,168,80,.06);border-radius:8px;font-size:.8rem;color:var(--songyan);line-height:1.65">💡 <b>卦象解读：</b>'+(r.strategyNote||'')+'</div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(74,106,138,.06);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">★ 互午 — 内在变化</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--jin)">《'+r.huguagName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+r.huguagIntro+'</div></div>';
-    html+='<div style="margin-top:12px;padding:14px;background:rgba(192,80,48,.04);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">➒ 之午 — 变化结果</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--zhusha)">《'+r.zhiguaName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+(r.changing&&r.changing.length>0?'此午有'+r.changing.length+'屙动，变屙翻转后得之午《'+r.zhiguaName+'》，代表此事的最终越向。':'无变屙，之午即本八，八象之意以本八为主。')+'</div></div>';
+    html+='<div style="margin-top:12px;padding:14px;background:rgba(192,80,48,.04);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">➒ 之午 — 变化结果</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--zhusha)">《'+r.zhiguaName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+(r.changing&&r.changing.length>0?'此午有'+r.changing.length+'屙动，变屙翻转后得之午《'+r.zhiguaName+'》，代表此事的最终��向。':'无变屙，之午即本八，八象之意以本八为主。')+'</div></div>';
     document.getElementById('yijing-result').innerHTML='<div class="section fade-in" style="padding:24px 28px 20px"><div class="section-label">易 经 卦 象</div>'+buildYiJingWheelSVG(r)+'</div>';
   },800);
 }
@@ -931,9 +932,9 @@ function go(){
       lastPillars=pils;lastDayS=dayS;
       document.getElementById('rn').textContent=name?name+' 的命盘全解':'命盘全解';
       document.getElementById('rm').textContent='公历 '+y+'年'+m+'月'+d+'日 '+DZ[hi]+'时 | '+gender+' | '+GY[dp.gi]+dEl+'命';
-      document.document.getElementById('pil').innerHTML=buildFourPillarsSVG(pils,dayS,hp,el);
+      document.getElementById('pil').innerHTML=buildFourPillarsSVG(pils,dayS,hp,el);
       var mx=Math.max.apply(null,EN.map(function(n){return el[n]}))||1;
-      document.document.getElementById('elb').innerHTML=buildFiveElementsSVG(el,EN);
+      document.getElementById('elb').innerHTML=buildFiveElementsSVG(el,EN);
       var ssCount=countShiShen(dayS,pils),monthSS=getShiShen(dayS,mp.s),geju=getGeJu(monthSS),ys=getYongShen(dEl,str,el);
       var pers=buildPersonality(dayS,str,ssCount,el,geju);
       document.getElementById('dmc').textContent=dayS;
@@ -944,7 +945,7 @@ function go(){
       document.getElementById('dmi').innerHTML=GY[dp.gi]+dEl+' · 日主偏'+str+' · '+virtueMap[dEl]+'德之命<br>'+tagHtml+'<br><span style="font-size:.78rem">五行：木'+el['木']+' 火'+el['火']+' 土'+el['土']+' 金'+el['金']+' 水'+el['水']+missingHtml+'</span>';
       document.getElementById('ptx').innerHTML=pers.text.split('\n').filter(function(p){return p.trim()}).map(function(p){return'<div class="ln-item">'+p+'</div>';}).join('');
       var ssDescs={比肩:'独立自主，同辈助力，但过旺则争强好胜',劫财:'竞争心重，财来财去，社交场合的存在感',食神:'才华福气，感受力强，懂得享受生活',伤官:'创意叛逆，不走寻常路，表达能力出众',偏财:'意外之财，人缘通达，对金钱嗅觉灵敏',正财:'稳定收入，务实理财，感情上专一可靠',七杀:'权威压力，敢闯敢拼，魄力十足但需防冲动',正官:'贵人名声，规则意识强，在体制内容易出头',偏印:'偏才技艺，直觉敏锐，擅长技术或冷门领域',正印:'学识庇护，学习能力强，有慈悲心'};
-      document.document.getElementById('ssg').innerHTML=buildTenGodsRadarSVG(ssCount,dayS);
+      document.getElementById('ssg').innerHTML=buildShiShenRadarSVG(ssCount,dayS);
       document.getElementById('gjn').textContent=geju;
       var gjDescs={正官格:'正官当令——你骨子里是走正道的人，规则意识强，在大机构或体制内往往比在江湖上走得更稳。适合公职、管理、律师等需要信誉积累的领域。',七杀格:'七杀当令——你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技类领域是你的天然战场。',正印格:'正印高照——你学习能力强，吸收知识快，而且学进去的东西能真正转化为能力。适合走学术路线，或者成为某个领域的深度专家。',偏印格:'偏印独秀——你的才华不在主流赛道，深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财当令——稳健积累是你的主旋律。你不是那种靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业等。',偏财格:'偏财旺盛——你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'食神吐秀——你自带让人想靠近的气场，有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官泄秀——你有说出来就让人惊讶的天赋。但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄当令——你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃逢冲——你身上有不服输的血性，这是力量源，也需要方向约束。没有约束的力量比软弱更危险，适合军警、竞技、法律等强对抗领域。'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
@@ -953,7 +954,7 @@ function go(){
       var mg=getMingGong(hp.b),ty=getTaiYuan(yp,mp),sg=getShenGong(hp),ln=getLiuNian(curYear,dayS);
       document.getElementById('ysg').innerHTML='<div class="ys-item ming"><div class="ys-label">命 宫</div><div class="ys-value" style="color:var(--jin)">'+mg+'</div></div><div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+(ys&&ys.xi?ys.xi.join(' · '):'—')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+(ys&&ys.ji?ys.ji.join(' · '):'—')+'</div></div><div class="ys-item yi-note"><div class="ys-label">命理解读</div><div class="ys-value" style="font-size:.78rem;color:var(--songyan);line-height:1.6">'+(ys&&ys.explanation?ys.explanation:'—')+'</div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
-      document.document.getElementById('dyt').innerHTML=buildDaYunTimelineSVG(dayun,pils,dayS,gender);
+      document.getElementById('dyt').innerHTML=buildDaYunTimelineSVG(dayun,pils,dayS,gender);
       document.getElementById('dyt').insertAdjacentHTML('beforebegin','<div style="margin:8px 0 4px;text-align:center;font-size:.72rem;color:var(--songyan);letter-spacing:1px">胎元 '+ty+'  ·  身宫 '+sg+'</div>');
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
@@ -1106,6 +1107,28 @@ function buildFourPillarsSVG(pils,dayS,hp,el){
     '</div>';
 }
 
+
+function buildFiveElementsSVG(el,EN){
+  // el = {木:N, 火:N, 土:N, 金:N, 水:N}
+  // EN = ['木','火','土','金','水']
+  if(!el)return'';
+  var mx=Math.max.apply(null,EN.map(function(n){return el[n]||0;}))||1;
+  var colors={木:'#5a7a5a',火:'#c05050',土:'#b8956a',金:'#c8a850',水:'#4a6a8a'};
+  var tips={木:'木主生发，对应肝胆、筋骨、神经系统。',火:'火主礼对应心小肠、血液、眼睛。',土:'土主信，对应脾胃、消化系统。',金:'金主义，对应肺、大肠、呼吸系统。',水:'水主智，对应肾、膀胱、耳朵。'};
+  var bars=EN.map(function(n){
+    var h=el[n]?Math.max(el[n]/mx*100,4):4;
+    var pct=el[n]||0;
+    return'<div class="feb" style="margin-bottom:10px">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:3px">'+
+        '<span style="color:var(--'+getElVar(n)+');font-size:.8rem">'+n+'</span>'+
+        '<span style="color:var(--songyan);font-size:.75rem">'+pct+'个</span></div>'+
+      '<div style="background:rgba(0,0,0,.06);height:6px;border-radius:3px;overflow:hidden">'+
+        '<div style="height:100%;width:'+h+'%;background:'+colors[n]+';border-radius:3px;transition:width .6s"></div></div>'+
+      '<div style="font-size:.7rem;color:var(--songyan);margin-top:2px">'+tips[n]+'</div></div>';
+  }).join('');
+  return'<div style="padding:8px 4px">'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+bars+'</div></div>';
+}
 function buildShiShenRadarSVG(ss,dayS){
   // 10 gods at 10 compass angles (clockwise from top = 0°)
   // 比肩=0°, 巳印=36°, 偏印=72°, 劫财=108°, 正财=144°, 偏财=180°, 伤官=216°, 食神=252°, 正官=288°, 七杀=324°
@@ -1382,6 +1405,7 @@ function buildYiJingWheelSVG(yj){
     leftPanel+rightPanel+
   '</div>';
 }
+
 </script>
 
 
