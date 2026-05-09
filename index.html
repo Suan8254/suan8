@@ -860,7 +860,7 @@ function doYiJing(){
     html+='<div style="margin-top:10px;padding:10px 14px;background:rgba(200,168,80,.06);border-radius:8px;font-size:.8rem;color:var(--songyan);line-height:1.65">💡 <b>卦象解读：</b>'+(r.strategyNote||'')+'</div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(74,106,138,.06);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">★ 互午 — 内在变化</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--jin)">《'+r.huguagName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+r.huguagIntro+'</div></div>';
     html+='<div style="margin-top:12px;padding:14px;background:rgba(192,80,48,.04);border-radius:10px;text-align:left"><div style="font-size:.7rem;letter-spacing:2px;color:var(--songyan);margin-bottom:8px">➒ 之午 — 变化结果</div><div style="font-family:LXGW WenKai,serif;font-size:.95rem;margin-bottom:6px;color:var(--zhusha)">《'+r.zhiguaName+'》</div><div style="font-size:.82rem;color:var(--songyan);line-height:1.7">'+(r.changing&&r.changing.length>0?'此午有'+r.changing.length+'屙动，变屙翻转后得之午《'+r.zhiguaName+'》，代表此事的最终越向。':'无变屙，之午即本八，八象之意以本八为主。')+'</div></div>';
-    document.getElementById('yijing-result').innerHTML=html;
+    document.getElementById('yijing-result').innerHTML='<div class="section fade-in" style="padding:24px 28px 20px"><div class="section-label">易 经 卦 象</div>'+buildYiJingWheelSVG(r)+'</div>';
   },800);
 }
 function doLiuRen(){
@@ -931,9 +931,9 @@ function go(){
       lastPillars=pils;lastDayS=dayS;
       document.getElementById('rn').textContent=name?name+' 的命盘全解':'命盘全解';
       document.getElementById('rm').textContent='公历 '+y+'年'+m+'月'+d+'日 '+DZ[hi]+'时 | '+gender+' | '+GY[dp.gi]+dEl+'命';
-      document.getElementById('pil').innerHTML=pils.map(function(p,i){var se=GE[p.gi],be=ZE[p.zi],ss=i===2?'日主':getShiShen(dayS,p.s),cg=ZCG[p.b]||[];return'<div class="pillar" ontouchstart="onPillarDown(event,'+i+')" ontouchend="onPillarUp()" ontouchcancel="onPillarUp()" oncontextmenu="event.preventDefault();showTT('+i+')"><div class="info-btn" onclick="event.stopPropagation();showTT('+i+')">?</div><div class="p-label">'+labels[i]+'</div><div class="p-stem" style="color:var(--'+getElVar(se)+')">'+p.s+'</div><div class="p-branch" style="color:var(--'+getElVar(be)+')">'+p.b+'</div><div class="p-shishen">'+ss+'</div><span class="tag el-'+se+'">'+se+'</span><div class="p-canggan">藏 '+(cg.length?cg.join(' '):'')+'</div></div>';}).join('');
+      document.document.getElementById('pil').innerHTML=buildFourPillarsSVG(pils,dayS,hp,el);
       var mx=Math.max.apply(null,EN.map(function(n){return el[n]}))||1;
-      document.getElementById('elb').innerHTML=EN.map(function(n){return'<div class="el-item"><div class="el-track"><div class="el-fill" style="height:'+(el[n]/mx*100)+'%;background:var(--'+getElVar(n)+')"></div></div><div class="el-name">'+n+'</div><div class="el-cnt">'+el[n]+'</div></div>';}).join('');
+      document.document.getElementById('elb').innerHTML=buildFiveElementsSVG(el,EN);
       var ssCount=countShiShen(dayS,pils),monthSS=getShiShen(dayS,mp.s),geju=getGeJu(monthSS),ys=getYongShen(dEl,str,el);
       var pers=buildPersonality(dayS,str,ssCount,el,geju);
       document.getElementById('dmc').textContent=dayS;
@@ -944,7 +944,7 @@ function go(){
       document.getElementById('dmi').innerHTML=GY[dp.gi]+dEl+' · 日主偏'+str+' · '+virtueMap[dEl]+'德之命<br>'+tagHtml+'<br><span style="font-size:.78rem">五行：木'+el['木']+' 火'+el['火']+' 土'+el['土']+' 金'+el['金']+' 水'+el['水']+missingHtml+'</span>';
       document.getElementById('ptx').innerHTML=pers.text.split('\n').filter(function(p){return p.trim()}).map(function(p){return'<div class="ln-item">'+p+'</div>';}).join('');
       var ssDescs={比肩:'独立自主，同辈助力，但过旺则争强好胜',劫财:'竞争心重，财来财去，社交场合的存在感',食神:'才华福气，感受力强，懂得享受生活',伤官:'创意叛逆，不走寻常路，表达能力出众',偏财:'意外之财，人缘通达，对金钱嗅觉灵敏',正财:'稳定收入，务实理财，感情上专一可靠',七杀:'权威压力，敢闯敢拼，魄力十足但需防冲动',正官:'贵人名声，规则意识强，在体制内容易出头',偏印:'偏才技艺，直觉敏锐，擅长技术或冷门领域',正印:'学识庇护，学习能力强，有慈悲心'};
-      document.getElementById('ssg').innerHTML=Object.entries(ssCount).map(function(x){return'<div class="ss-item"><div class="ss-name">'+x[0]+'</div><div class="ss-count">'+x[1]+'</div><div class="ss-desc">'+ssDescs[x[0]]+'</div></div>';}).join('');
+      document.document.getElementById('ssg').innerHTML=buildTenGodsRadarSVG(ssCount,dayS);
       document.getElementById('gjn').textContent=geju;
       var gjDescs={正官格:'正官当令——你骨子里是走正道的人，规则意识强，在大机构或体制内往往比在江湖上走得更稳。适合公职、管理、律师等需要信誉积累的领域。',七杀格:'七杀当令——你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技类领域是你的天然战场。',正印格:'正印高照——你学习能力强，吸收知识快，而且学进去的东西能真正转化为能力。适合走学术路线，或者成为某个领域的深度专家。',偏印格:'偏印独秀——你的才华不在主流赛道，深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财当令——稳健积累是你的主旋律。你不是那种靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业等。',偏财格:'偏财旺盛——你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'食神吐秀——你自带让人想靠近的气场，有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官泄秀——你有说出来就让人惊讶的天赋。但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄当令——你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃逢冲——你身上有不服输的血性，这是力量源，也需要方向约束。没有约束的力量比软弱更危险，适合军警、竞技、法律等强对抗领域。'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
@@ -953,7 +953,7 @@ function go(){
       var mg=getMingGong(hp.b),ty=getTaiYuan(yp,mp),sg=getShenGong(hp),ln=getLiuNian(curYear,dayS);
       document.getElementById('ysg').innerHTML='<div class="ys-item ming"><div class="ys-label">命 宫</div><div class="ys-value" style="color:var(--jin)">'+mg+'</div></div><div class="ys-item xi"><div class="ys-label">喜 用 神</div><div class="ys-value" style="color:var(--mu)">'+(ys&&ys.xi?ys.xi.join(' · '):'—')+'</div></div><div class="ys-item ji"><div class="ys-label">忌 神</div><div class="ys-value" style="color:var(--zhusha)">'+(ys&&ys.ji?ys.ji.join(' · '):'—')+'</div></div><div class="ys-item yi-note"><div class="ys-label">命理解读</div><div class="ys-value" style="font-size:.78rem;color:var(--songyan);line-height:1.6">'+(ys&&ys.explanation?ys.explanation:'—')+'</div></div>';
       var dayun=getDaYun(yp.gi,mp.gi,mp.zi,gender);
-      document.getElementById('dyt').innerHTML=dayun.map(function(d){return'<div class="dy-item"><div class="dy-step">第'+d.step+'步</div><div class="dy-gz">'+d.s+d.b+'</div><div class="dy-age">'+d.startAge+'-'+d.endAge+'岁</div><div class="dy-ss">'+getShiShen(dayS,d.s)+'</div></div>';}).join('');
+      document.document.getElementById('dyt').innerHTML=buildDaYunTimelineSVG(dayun,pils,dayS,gender);
       document.getElementById('dyt').insertAdjacentHTML('beforebegin','<div style="margin:8px 0 4px;text-align:center;font-size:.72rem;color:var(--songyan);letter-spacing:1px">胎元 '+ty+'  ·  身宫 '+sg+'</div>');
       document.getElementById('lnt').textContent=curYear+'年 流 年 运 势';
       document.getElementById('lny').textContent=ln.gz;
