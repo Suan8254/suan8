@@ -213,6 +213,7 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
 /* Ten Gods */
 .shishen-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 @media(max-width:600px){.shishen-grid{grid-template-columns:repeat(2,1fr)}}
+.ss-legend-toggle{cursor:pointer;font-size:.72rem;color:var(--songyan);margin-bottom:10px;text-align:center;padding:4px;background:rgba(42,36,32,.03);border-radius:6px;border:1px solid var(--border);transition:background .2s}.ss-legend-toggle:hover{background:rgba(42,36,32,.06)}.ss-legend-toggle::before{content:'什么是十神？▾ '}.ss-legend-toggle.active::before{content:'什么是十神？▴ '}.ss-legend{overflow:hidden;max-height:0;transition:max-height .4s ease}.ss-legend.open{max-height:600px}.ss-legend-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:8px 0 12px}.ss-legend-item{font-size:.68rem;color:var(--songyan);line-height:1.6;padding:8px;background:rgba(42,36,32,.02);border-radius:8px}.ss-legend-item b{font-family:'LXGW WenKai',serif;font-size:.78rem;color:var(--mo);margin-right:2px}
 .ss-item{
   text-align:center;padding:14px 6px;border-radius:10px;
   background:rgba(42,36,32,.02);border:1px solid var(--border);
@@ -392,7 +393,7 @@ select:focus,input:focus{outline:none;border-color:var(--zhusha)}
   <div class="section fade-in s4"><div class="section-title">性 格 概 述</div><p class="personality-text" id="ptx"></p></div>
 
   <!-- 5. Ten Gods -->
-  <div class="section fade-in s5"><div class="section-title">十 神 分 析</div><div class="shishen-grid" id="ssg"></div></div>
+  <div class="section fade-in s5"><div class="section-title">十 神 分 析</div><div class="ss-legend-toggle" onclick="this.classList.toggle('active');var l=this.nextElementSibling;l.classList.toggle('open')">什么是十神？十神是根据日主（五行）与年月日时其他天干的生克关系推算出的十个符号，代表你在不同人生场景中的角色与特质。点击展开参考含义 ↓</div><div class="ss-legend"><div class="ss-legend-grid"><div class="ss-legend-item"><b>比肩</b>独立自主，同辈助力，过旺则争强好胜</div><div class="ss-legend-item"><b>劫财</b>竞争心重，财来财去，社交场合的存在感</div><div class="ss-legend-item"><b>食神</b>才华福气，感受力强，懂得享受生活</div><div class="ss-legend-item"><b>伤官</b>创意叛逆，不走寻常路，表达能力出众</div><div class="ss-legend-item"><b>正财</b>稳定收入，务实理财，感情上专一可靠</div><div class="ss-legend-item"><b>偏财</b>意外之财，人缘通达，对金钱嗅觉灵敏</div><div class="ss-legend-item"><b>七杀</b>权威压力，敢闯敢拼，魄力十足但需防冲动</div><div class="ss-legend-item"><b>正官</b>贵人名声，规则意识强，在体制内容易出头</div><div class="ss-legend-item"><b>偏印</b>偏才技艺，直觉敏锐，擅长技术或冷门领域</div><div class="ss-legend-item"><b>正印</b>学识庇护，学习能力强，有慈悲心</div></div><div style="font-size:.68rem;color:var(--songyan);line-height:1.7;padding:8px 0 4px;border-top:1px dashed var(--border);margin-top:4px"><b style="color:var(--mo)">十神速查表：</b>官（正官）＝管理与秩序；杀（七杀）＝魄力与压力；印（正印/偏印）＝学识与庇护；财（正财/偏财）＝财富与务实；食（食神/伤官）＝才华与创意。比肩/劫财代表同类竞争与助力。</div></div><div class="shishen-grid" id="ssg"></div></div>
 
   <!-- 6. GeJu & YongShen -->
   <div class="section fade-in s6 gj-box"><div class="section-title">格 局 · 用 神</div><div class="gj-name" id="gjn"></div><div class="gj-desc" id="gjd"></div><div class="ys-grid" id="ysg"></div></div>
@@ -801,16 +802,16 @@ function buildPersonality(dayS,str,ssCount,el,geju){
 
   // ── Paragraph 5: 格/格局 ──
   var gjT={
-    正官格:{t:'正道',d:'你适合在规则清晰、系统完善的环境里发挥——大企业、政府机构、体制内是你的舒适区。'},
-    七杀格:{t:'开拓',d:'规则太多会束缚你，竞争激烈、变化快的地方最能激发你的潜能。创业、武职更适合你。'},
-    正印格:{t:'学术',d:'你有很强的学习和吸收能力，适合走学术路线或成为某个领域的深度专家。'},
-    偏印格:{t:'偏才',d:'你的才华不在主流赛道，边缘领域反而更容易出头。'},
-    正财格:{t:'积累',d:'你适合稳健积累型，耐下心来一步一个脚印，比走捷径的人更快到达终点。'},
-    偏财格:{t:'机遇',d:'你对机会的嗅觉比大多数人灵敏，但学会在出手前多等24小时，能避开大多数坑。'},
-    食神格:{t:'享福',d:'你自带让人愿意靠近的气场，艺术、餐饮、生活方式领域是你的天然优势区。'},
-    伤官格:{t:'才子',d:'你有说出来就让人惊讶的天赋，但把天赋落地需要找到可量化价值的领域深耕。'},
-    建禄格:{t:'自立',d:'你天然适合自己干——不是打工者思维，天花板比大多数人都高。'},
-    羊刃格:{t:'刚烈',d:'你身上有不服输的血性，这是力量源也需要方向约束，没有约束的力量比软弱更危险。'}
+    正官格:{t:'正道',d:'"官"在命理里是权力与责任的象征。正官当令，说明你骨子里是走正道、守规则的人。在体制内、政府机构、大企业里，你往往比在江湖上走得更稳。适合公职、管理、法律、律师等需要信誉积累的领域。'},
+    七杀格:{t:'开拓',d:'七杀是"官"的另一种形态——不是体制内的权，而是魄力与魄力。七杀当令，你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技是你的天然战场。'},
+    正印格:{t:'学术',d:'印星代表学识与庇护。你有很强的学习吸收能力，学进去的东西能真正转化为能力。适合走学术路线，或成为某个领域的深度专家。'},
+    偏印格:{t:'偏才',d:'你的才华不在主流赛道。深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。'},
+    正财格:{t:'积累',d:'正财代表稳定收入与务实积累。你不是靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业。'},
+    偏财格:{t:'机遇',d:'偏财代表意外之财与机会嗅觉。你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。'},
+    食神格:{t:'享福',d:'你自带让人愿意靠近的气场——有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。'},
+    伤官格:{t:'才子',d:'伤官代表不羁的创意。你有说出来就让人惊讶的天赋，但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。'},
+    建禄格:{t:'自立',d:'建禄是日主得令而身旺。你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。'},
+    羊刃格:{t:'刚烈',d:'羊刃是地支的阳刃，血性十足。这是力量源，也需要方向约束。没有约束的力量比软弱更危险。适合军警、竞技、法律等强对抗领域。'}
   };
 
   // ── Assemble paragraphs in natural reading order ──
@@ -855,7 +856,7 @@ function doYiJing(){
   document.getElementById('yijing-result').innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:2rem">🚙</div><div style="margin-top:8px;color:var(--songyan)">心诚则灵，起午中...</div></div>';
   setTimeout(function(){
     var r=getYiJingHexagram(q);
-    var stratColor={'守':'气—气','变':'气—灵活','留':'气—声响','观':'气—表示','慎':'气—危险','走':'气—迅速'}[r.strategy]||'气—气';
+    var stratColor={'守':'rgba(74,106,138,.2)','变':'rgba(192,80,48,.2)','留':'rgba(200,168,80,.2)','观':'rgba(106,96,88,.2)','慎':'rgba(192,64,48,.2)','走':'rgba(192,64,48,.2)'}[r.strategy]||'rgba(106,96,88,.15)';
     var html='<div style="text-align:center;margin-bottom:20px"><div style="font-family:LXGW WenKai,serif;font-size:2.2rem;font-weight:700;margin-bottom:4px">'+r.name+'</div><div style="font-size:.8rem;color:var(--songyan);letter-spacing:2px">第'+r.guaNum+'八</div></div>';
     html+='<div style="background:rgba(42,36,32,.04);padding:16px;border-radius:10px;margin-bottom:14px"><div style="font-family:LXGW WenKai,serif;font-size:.95rem;line-height:1.8">'+r.guaCi+'</div><div style="font-size:.85rem;color:var(--songyan);margin-top:8px">象日：'+r.img+'</div></div>';
     html+='<div style="background:var(--card);padding:14px;border-radius:10px;margin-bottom:14px;text-align:left"><div style="font-size:.75rem;color:var(--songyan);margin-bottom:8px;letter-spacing:2px">六爻：</div>';
@@ -952,7 +953,7 @@ function go(){
       var ssDescs={比肩:'独立自主，同辈助力，但过旺则争强好胜',劫财:'竞争心重，财来财去，社交场合的存在感',食神:'才华福气，感受力强，懂得享受生活',伤官:'创意叛逆，不走寻常路，表达能力出众',偏财:'意外之财，人缘通达，对金钱嗅觉灵敏',正财:'稳定收入，务实理财，感情上专一可靠',七杀:'权威压力，敢闯敢拼，魄力十足但需防冲动',正官:'贵人名声，规则意识强，在体制内容易出头',偏印:'偏才技艺，直觉敏锐，擅长技术或冷门领域',正印:'学识庇护，学习能力强，有慈悲心'};
       document.getElementById('ssg').innerHTML=buildShiShenRadarSVG(ssCount,dayS);
       document.getElementById('gjn').textContent=geju;
-      var gjDescs={正官格:'正官当令——你骨子里是走正道的人，规则意识强，在大机构或体制内往往比在江湖上走得更稳。适合公职、管理、律师等需要信誉积累的领域。',七杀格:'七杀当令——你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技类领域是你的天然战场。',正印格:'正印高照——你学习能力强，吸收知识快，而且学进去的东西能真正转化为能力。适合走学术路线，或者成为某个领域的深度专家。',偏印格:'偏印独秀——你的才华不在主流赛道，深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财当令——稳健积累是你的主旋律。你不是那种靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业等。',偏财格:'偏财旺盛——你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'食神吐秀——你自带让人想靠近的气场，有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官泄秀——你有说出来就让人惊讶的天赋。但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄当令——你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃逢冲——你身上有不服输的血性，这是力量源，也需要方向约束。没有约束的力量比软弱更危险，适合军警、竞技、法律等强对抗领域。'};
+      var gjDescs={正官格:'"官"在命理里是权力与责任的象征。正官当令，说明你骨子里是走正道、守规则的人。在体制内，政府机构、大企业里，你往往比在江湖上走得更稳。适合公职、管理、法律、律师等需要信誉积累的领域。',七杀格:'七杀是"官"的另一种形态——不是体制内的权，而是魄力与魄力。七杀当令，你是那种在压力下反而更强的人。竞争激烈、变化快的环境最能激发你的潜能。创业、武职、竞技是你的天然战场。',正印格:'印星代表学识与庇护。你有很强的学习吸收能力，学进去的东西能真正转化为能力。适合走学术路线，或成为某个领域的深度专家。',偏印格:'你的才华不在主流赛道。深度技术、研究、医疗、玄学等需要直觉力和洞察力的领域反而更容易出头。',正财格:'正财代表稳定收入与务实积累。你不是靠运气赚钱的人，而是靠守住、再守住。适合会计、金融、行政管理、家族企业。',偏财格:'偏财代表意外之财与机会嗅觉。你对机会的嗅觉比大多数人灵敏，但灵敏度也是陷阱。学会在出手前多等24小时，这一个习惯能帮你避开大多数坑。',食神格:'你自带让人愿意靠近的气场——有品位、有才华、生活有质感。艺术、餐饮、生活方式创业是你的天然优势区。',伤官格:'伤官代表不羁的创意。你有说出来就让人惊讶的天赋，但把天赋落地需要找到一个能把创意转化为可量化价值的领域深耕。',建禄格:'建禄是日主得令而身旺。你是天然的创业者或创造者，不是打工者思维。早期比别人辛苦，但天花板比大多数人都高。',羊刃格:'羊刃是地支的阳刃，血性十足。这是力量源，也需要方向约束。没有约束的力量比软弱更危险。适合军警、竞技、法律等强对抗领域。'};
       document.getElementById('gjd').textContent=gjDescs[geju]||'格局特殊，需综合分析';
       
       var curYear=new Date().getFullYear();
